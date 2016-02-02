@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include "Shell.h"
 
 using namespace std;
 
@@ -15,10 +16,12 @@ class Command : public Shell {
        Command(string s) : str(s) {};
 
        void execute() {
-           // execute this command
-           
-           // check
-           // cout << "Executed!" << endl;
+       	   // execute this command
+       	   // check
+
+       	   // cout << "Executed!" << endl;
+
+           return str;
        };
 };
 

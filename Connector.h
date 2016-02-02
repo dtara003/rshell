@@ -2,6 +2,7 @@
 #define CONNECTOR_H
 
 #include <iostream>
+#include "Shell.h"
 
 using namespace std;
 
@@ -16,6 +17,7 @@ class Connector : public Shell {
 
         void execute() {
             // execute something
+            return 0;
         };
 };
 

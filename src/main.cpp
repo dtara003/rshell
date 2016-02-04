@@ -10,18 +10,12 @@
 using namespace std;
 
 int main() {
-    string user = getlogin();
-    char hostname[100];
-    gethostname(hostname, 100);
-    
-    cout << "[" << user << "@" << hostname << "]$ ";
-    
-
-    //Shell s;
-    //s.prompt();
-    
     /*while(1) {
-        string input;
+
+       */ Shell s;
+        s.prompt();
+
+        /*string input;
         getline(cin, input);
         
         stringstream str(input);

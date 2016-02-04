@@ -1,11 +1,11 @@
+#include "Shell.h"
+
 #include <iostream>
 #include <vector>
 #include <sstream>
 #include <unistd.h>
 
 //comment
-
-// unistd.h used later for execution of commands
 
 using namespace std;
 
@@ -15,6 +15,10 @@ int main() {
     gethostname(hostname, 100);
     
     cout << "[" << user << "@" << hostname << "]$ ";
+    
+
+    //Shell s;
+    //s.prompt();
     
     /*while(1) {
         string input;

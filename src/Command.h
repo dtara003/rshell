@@ -57,7 +57,7 @@ class Command : public Shell {
 			}
 
 			//parent will have a pid > 0
-			if (pid > 0) {
+			//if (pid > 0) {
 
 				//now we want to check what value the child returned(either a 50
 				//or 0). A 50 indicates that the execvp failed to execute and
@@ -77,7 +77,7 @@ class Command : public Shell {
 				else
 					return true; //command executed therefore return true
 			}
-		}
+		//}
 };
 #endif
 

@@ -16,7 +16,7 @@ class Shell {
 		//a function used to set the left pointer of a connector
 		//that has two commands(will only be implemented by Connector2
 		//composite classes)
-		virtual void setLeft() {return;}
+		virtual void setLeft(Shell* s) {return;}
 
 		//execute function that returns a bool based on conditions(i.e.
 		//calling execute on an And composite that contains commands

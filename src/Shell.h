@@ -2,49 +2,27 @@
 #define SHELL_H
 
 #include <iostream>
+#include <stdio.h>
 #include <unistd.h>
-#include <string.h>
+#include <sys/wait.h>
+#include <sys/types.h>
 #include <stdlib.h>
 
 using namespace std;
 
 class Shell {
-    //private:
-        //string input; 
-    public:
+	public:
 		Shell() {};
-		
-        void prompt() {
-            string user = getlogin();
-            char hostname[100];
-            gethostname(hostname, 100);
-    
-            cout << "[" << user << "@" << hostname << "]$ ";
-            
-            char input[1000];
-            
-            cin.getline(input, 1000, '\n');
+		//a function used to set the left pointer of a connector
+		//that has two commands(will only be implemented by Connector2
+		//composite classes)
+		virtual void setLeft() {return;}
 
-            if (strcmp(input, "exit") == 0) {
-                exit(0);
-            }
-
-            for (int i = 0; i < strlen(input); ++i) {
-                if (input[i] == '#') {
-                    input[i] = '\0';
-                    i = strlen(input);
-                }
-            }
-
-            for (int i = 0; i < strlen(input); ++i) {
-                cout << input[i];
-            }
-
-            cout << endl;
-        };   
-
-        //virtual void execute() = 0;
+		//execute function that returns a bool based on conditions(i.e.
+		//calling execute on an And composite that contains commands
+		//that executed as executed  && failed to execute
+		//will return a false)
+		virtual bool execute() = 0; 
 };
 
 #endif
-

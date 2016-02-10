@@ -1,4 +1,4 @@
-#include "Shell.h"
+#include "Prompt.h"
 
 #include <iostream>
 #include <vector>
@@ -10,32 +10,11 @@
 using namespace std;
 
 int main() {
-    /*while(1) {
-
-       */ Shell s;
-        s.prompt();
-
-        /*string input;
-        getline(cin, input);
-        
-        stringstream str(input);
-        string s;
-        
-        vector <string> words;
-
-        while (str >> s) {
-            words.push_back(s);
-
-            if (s == "exit") {
-                return 0;
-            } else {
-                cout << s << endl;
-            }
-        }
-
-        // check
-        // cout << input << endl;
-    }*/
+    while(1) {
+        Prompt p;
+        p.promptUser();
+    }
 
     return 0;
 }
+

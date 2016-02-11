@@ -1,4 +1,3 @@
-
 #include "Prompt.h"
 
 #include <iostream>
@@ -11,6 +10,11 @@
 using namespace std;
 
 int main() {
+    while(1) {
+        Prompt pr;
+        pr.promptUser();
+    }
+
     return 0;
 }
 

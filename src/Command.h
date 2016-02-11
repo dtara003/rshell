@@ -2,24 +2,48 @@
 #define COMMAND_H
 
 #include "Shell.h"
+#include <vector>
+#include <sstream>
 
 using namespace std;
 
 class Command : public Shell {
 	private:
-
+    
 		//execvp takes two arguments: cmd[0](which is the
 		//executable), and it takes in the whole char* array
 		//for the rest of the arguments(i.e. cmd = ls -a 
 		//then cmd[0] = ls)
-		char** cmd;
-
+		//char** cmd;
+		string cmd;
 	public:
 		//FIXME Can you initialize char** together like that?
-		Command (char** c) : cmd(c) {}
-
+		//Command(char** c) : cmd(c) {}
+		
+		//a constructor that takes in string arguments and converts to char**
+		Command(string c) :cmd(c) {}
+	
 		//function returns true if command executed
 		bool execute() {
+			
+			//convert string to char* []
+			unsigned int sz = 0; //will keep track of the size of the char**
+			string in = ""; //takes input from stringstream
+			vector<string> v; //stores the "words"
+			
+			stringstream str(cmd); //get rid of white spaces
+			while (str >> in) {
+				v.push_back(in);
+			}
+			sz = v.size() + 1; //set the char** array size(including NULL)
+		
+			char* arr[1024];
+
+			for (unsigned int i = 0; i < v.size(); i++) {
+				arr[i] = (char* ) v.at(i).c_str();
+			}
+			arr[sz] = NULL; //set the null terminating character
+
 			//fork() returns two pids: 0 for child, pid for parent
 			pid_t pid = fork();
 
@@ -41,7 +65,7 @@ class Command : public Shell {
 				//execvp returns -1 if the command did not execute
 				//we also want this whole function(execute)
 				//to return false if the command in execvp did not execute
-				if (execvp(cmd[0],cmd) == -1) {
+				if (execvp(arr[0],arr) == -1) {
 
 					//print out error message
 					perror("Error");
@@ -57,27 +81,25 @@ class Command : public Shell {
 			}
 
 			//parent will have a pid > 0
-			//if (pid > 0) {
 
-				//now we want to check what value the child returned(either a 50
-				//or 0). A 50 indicates that the execvp failed to execute and
-				//therefore we want to return false in this execute function
+			//now we want to check what value the child returned(either a 50
+			//or 0). A 50 indicates that the execvp failed to execute and
+			//therefore we want to return false in this execute function
 				
-				int status = 0;
+			int status = 0;
 				
-				//wait for child to terminate(prevent "zombie" processes
-				wait(&status);
+			//wait for child to terminate(prevent "zombie" processes
+			wait(&status);
 
-				//get the value that the child returned(0 or 50)
-				int childReturnVal = WEXITSTATUS(status);
-				if (childReturnVal == 50) {
-					//this means the command did not execute so return false
-					return false;
-				}
-				else
-					return true; //command executed therefore return true
+			//get the value that the child returned(0 or 50)
+			int childReturnVal = WEXITSTATUS(status);
+			if (childReturnVal == 50) {
+				//this means the command did not execute so return false
+				return false;
 			}
-		//}
+			else 
+				return true; //command executed therefore return true
+			}
 };
 #endif
 

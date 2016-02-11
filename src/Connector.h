@@ -1,24 +1,19 @@
 #ifndef CONNECTOR_H
 #define CONNECTOR_H
 
-#include <iostream>
 #include "Shell.h"
 
 using namespace std;
 
+//Composite class for Connectors(&& and ||)
 class Connector : public Shell {
-    public:
+    protected:
         Shell* left;
         Shell* right;
 
-    private:
+    public:
         Connector() {};
-        Connector(Shell* l, Shell* r) : left(l), right(r) {};
-
-        void execute() {
-            // execute something
-            return 0;
-        };
+        bool execute() {return true;}
 };
 
 #endif

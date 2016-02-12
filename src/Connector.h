@@ -34,7 +34,21 @@ class Semi : public Connector {
         };
 
         bool execute() {
-            return true;
+            // semicolon works so that regardless of the left
+            // side of the connector, the right side will always
+            // pass through the execute function
+            
+            // the returned value of the right child command will
+            // set the returned value of the semicolon itself
+            // for a parent node it it itself is not the root
+
+            //FIXME: account for 'exit' command
+
+            if (left->execute()) {
+                return right->execute();
+            }
+
+            return right->execute();
         };
 };
 
@@ -58,13 +72,11 @@ class And : public Connector {
 
 		//execute function that will perform as &&
 		bool execute() {
-			if (left->execute() == true) {
-				right->execute();
-				return true;
-			}
-			else {
-				return false;
+		    if (left->execute()) {
+                return right->execute();
             }
+
+            return false;
 		};
 };
 
@@ -81,8 +93,13 @@ class Or : public Connector {
 			/*assuming execute returns the command name for testing
 			cout << "Executed: " << left->execute() << " or " << "Executed: "
                  << right->execute();*/
-            return true;
-		};
+            
+            if (left->execute()) {
+                return true;
+            }
+
+            return right->execute();
+        };
 };
 
 #endif

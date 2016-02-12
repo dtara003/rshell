@@ -152,7 +152,10 @@ class Prompt {
                             commStrs.push_back(temp);
 
                             input = input.substr(i + 1, input.size() - 1);
-                            cout << input << endl;
+
+                            // check
+                            // cout << input << endl;
+
                             i = 0;
                             connVals.push_back(1);
                         } else {
@@ -165,7 +168,7 @@ class Prompt {
                                 commStrs.push_back(temp);
 
                                 input = input.substr(i + 1, input.size() - 1);
-                                cout << input << endl;
+                                // cout << input << endl;
                                 Shell* b = new Semi(ptr, a);
                                 
                                 // Shell* pointer now points to semicolon
@@ -180,7 +183,7 @@ class Prompt {
                                 commStrs.push_back(temp);
 
                                 input = input.substr(i + 1, input.size() - 1);
-                                cout << input << endl;
+                                // cout << input << endl;
                                 Shell* b = new And(ptr, a);
     
                                 ptr = b;
@@ -193,7 +196,7 @@ class Prompt {
                                 commStrs.push_back(temp);
 
                                 input = input.substr(i + 1, input.size() - 1);
-                                cout << input << endl;
+                                // cout << input << endl;
                                 Shell* b = new Or(ptr, a);
     
                                 ptr = b;
@@ -212,7 +215,7 @@ class Prompt {
                             commStrs.push_back(temp);
                             
                             input = input.substr(i + 2, input.size() - 1);
-                            cout << input << endl;
+                            // cout << input << endl;
                             i = 0;
                             connVals.push_back(2);
                         } else {
@@ -223,7 +226,7 @@ class Prompt {
                                 commStrs.push_back(temp);
 
                                 input = input.substr(i + 2, input.size() - 1);
-                                cout << input << endl;
+                                // cout << input << endl;
                                 Shell* b = new Semi(ptr, a);
 
                                 ptr = b;
@@ -236,7 +239,7 @@ class Prompt {
                                 commStrs.push_back(temp);
 
                                 input = input.substr(i + 2, input.size() - 1);
-                                cout << input << endl;
+                                // cout << input << endl;
                                 Shell* b = new And(ptr, a);
     
                                 ptr = b;
@@ -249,7 +252,7 @@ class Prompt {
                                 commStrs.push_back(temp);
                                 
                                 input = input.substr(i + 2, input.size() - 1);
-                                cout << input << endl;
+                                // cout << input << endl;
                                 Shell* b = new Or(ptr, a);
     
                                 ptr = b;
@@ -267,7 +270,7 @@ class Prompt {
                             commStrs.push_back(temp);
 
                             input = input.substr(i + 2, input.size() - 1);
-                            cout << input << endl;
+                            // cout << input << endl;
                             i = 0;
                             connVals.push_back(3);
                         } else {
@@ -278,7 +281,7 @@ class Prompt {
                                 commStrs.push_back(temp);
 
                                 input = input.substr(i + 2, input.size() - 1);
-                                cout << input << endl;
+                                // cout << input << endl;
                                 Shell* b = new Semi(ptr, a);
     
                                 ptr = b;
@@ -291,7 +294,7 @@ class Prompt {
                                 commStrs.push_back(temp);
 
                                 input = input.substr(i + 2, input.size() - 1);
-                                cout << input << endl;
+                                // cout << input << endl;
                                 Shell* b = new And(ptr, a);
     
                                 ptr = b;
@@ -304,7 +307,7 @@ class Prompt {
                                 commStrs.push_back(temp);
 
                                 input = input.substr(i + 2, input.size() - 1);
-                                cout << input << endl;
+                                // cout << input << endl;
                                 Shell* b = new Or(ptr, a);
     
                                 ptr = b;

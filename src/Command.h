@@ -35,7 +35,7 @@ class Command : public Shell {
 			}
 			
 			//get rid of quotation marks
-			for (int i = 0; i < cmd.size(); i++) {
+			for (unsigned int i = 0; i < cmd.size(); i++) {
 				if (cmd.at(i) == '\"') {
 					cmd.erase(i, 1);
 				}

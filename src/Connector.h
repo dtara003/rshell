@@ -18,9 +18,12 @@ class Connector : public Shell {
     public:
         // constructor
         Connector() {};
-
-        bool execute() {
-            return true;
+		~Connector() {
+			delete left;
+			delete right;
+		};
+        status execute() {
+            return EXECUTED;
         };
 };
 
@@ -32,23 +35,24 @@ class Semi : public Connector {
             left = l;
             right = r;
         };
+        ~Semi() {};
 
-        bool execute() {
+        status execute() {
             // semicolon works so that regardless of the left
             // side of the connector, the right side will always
             // pass through the execute function
-            
-            // the returned value of the right child command will
-            // set the returned value of the semicolon itself
-            // for a parent node it it itself is not the root
 
-            //FIXME: account for 'exit' command
+			//execute the left child and determine its status
+            status check = left->execute();
 
-            if (left->execute()) {
+            if (check == EXECUTED) {
                 return right->execute();
             }
-
-            return right->execute();
+			else if (check == EXIT) {
+				return EXIT;
+			}
+			else
+				return right->execute();
         };
 };
 
@@ -60,23 +64,27 @@ class And : public Connector {
         // some reason -- a limitation of inheritance?
         // probably because left and right aren't directly members of
         // the classes that inherit from the Connector class
-		And(Shell* l, Shell* r) { //: left(l), right(r) {};
+		And(Shell* l, Shell* r) { 
             left = l;
             right = r;
         };
 
-		//set the left pointer to whatever the argument is pointing at
-		//void setLeft(Shell* s) {
-			//left = s;
-		//};
+        ~And() {}
 
 		//execute function that will perform as &&
-		bool execute() {
-		    if (left->execute()) {
+		status execute() {
+			
+			//check the status of the left->execute()
+			status check = left->execute();
+
+		    if (check == EXECUTED) {
                 return right->execute();
             }
-
-            return false;
+			else if (check == EXIT) {
+				return EXIT;
+			}
+			else
+				return FAILED;
 		};
 };
 
@@ -89,16 +97,21 @@ class Or : public Connector {
             right = r;
         };
 
-		bool execute() {
-			/*assuming execute returns the command name for testing
-			cout << "Executed: " << left->execute() << " or " << "Executed: "
-                 << right->execute();*/
-            
-            if (left->execute()) {
-                return true;
-            }
+        ~Or() {};
 
-            return right->execute();
+		status execute() {
+            
+            //check the what left->execute() returns
+            status check = left->execute();
+
+            if (check == EXECUTED) {
+                return EXECUTED;
+            }
+			else if (check == EXIT) {
+				return EXIT;
+			}
+			else
+				return right->execute();
         };
 };
 

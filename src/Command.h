@@ -9,24 +9,32 @@ using namespace std;
 
 class Command : public Shell {
 	private:
-    
 		//execvp takes two arguments: cmd[0](which is the
 		//executable), and it takes in the whole char* array
 		//for the rest of the arguments(i.e. cmd = ls -a 
 		//then cmd[0] = ls)
-		//char** cmd;
+
 		string cmd;
+
 	public:
-		//FIXME Can you initialize char** together like that?
-		//Command(char** c) : cmd(c) {}
-		
 		//a constructor that takes in string arguments and converts to char**
-		Command(string c) :cmd(c) {}
-	
+		Command(string c) :cmd(c) {};
+		~Command() {};	
 		//function returns true if command executed
-		bool execute() {
+		status execute() {
 			
-			//convert string to char* []
+			//check if the string is "exit"
+			//we need a special case for this because execvp does not
+			//take exit as a command
+			
+			//if the string is exit then we want to return EXIT and go back to
+			//our prompt class and delete the tree and call exit(0)
+			if (cmd == "exit") {
+				return EXIT;
+			}
+								
+			//otherwise convert string to char []
+
 			unsigned int sz = 0; //will keep track of the size of the char**
 			string in = ""; //takes input from stringstream
 			vector<string> v; //stores the "words"
@@ -37,19 +45,18 @@ class Command : public Shell {
 			}
 			sz = v.size() + 1; //set the char** array size(including NULL)
 		
-			char* arr[1024];
-
+			char* arr[1024]; //set the size of the char* array
+			
+			//populate the array
 			for (unsigned int i = 0; i < v.size(); i++) {
 				arr[i] = (char* ) v.at(i).c_str();
 			}
+			
 			arr[sz] = NULL; //set the null terminating character
 
 			//fork() returns two pids: 0 for child, pid for parent
 			pid_t pid = fork();
-
-			//fork() returns a pid_t that determines which
-			//process it is(i.e. child or parent)
-
+			
 			//if pid < 0 then the fork failed
 			if (pid < 0) {
 				perror("Fork failed");
@@ -64,15 +71,16 @@ class Command : public Shell {
 				//error check execvp
 				//execvp returns -1 if the command did not execute
 				//we also want this whole function(execute)
-				//to return false if the command in execvp did not execute
+				//to return false(FAILED)
+				//if the command in execvp did not execute
 				if (execvp(arr[0],arr) == -1) {
 
 					//print out error message
 					perror("Error");
 					
 					//we can put any number(I think) and when this child process
-					//terminates(through exit) it should return the number
-					//argument(in this case 50)
+					//terminates(through exit) it should return a number
+					//and we can use WEXITSTATUS to get the number 50
 					exit(50);
 				}
 
@@ -88,18 +96,22 @@ class Command : public Shell {
 				
 			int status = 0;
 				
-			//wait for child to terminate(prevent "zombie" processes
+			//wait for child to terminate(prevent "zombie" processes)
 			wait(&status);
 
 			//get the value that the child returned(0 or 50)
 			int childReturnVal = WEXITSTATUS(status);
 			if (childReturnVal == 50) {
 				//this means the command did not execute so return false
-				return false;
+				return FAILED;
 			}
 			else 
-				return true; //command executed therefore return true
-			}
+				return EXECUTED; //command executed therefore return true
+		};
+
+		void freeMem() {
+			return;
+		};
 };
 #endif
 

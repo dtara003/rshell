@@ -40,23 +40,15 @@ class Prompt {
             cout << "[" << user << "@" << hostname << "]$ ";          
             getline(cin, input);
             
-            // cout << "1" << endl;
-
             // exit if prompted to do so
             if (input == "exit") {
                 exit(0);
             }
             
-            // cout << "2" << endl;
-
             rmComments(input);
             
             // check
-            // cout << "3" << endl;
             // cout << "w/o comments: " << input << endl;
-            
-            //parse();
-            //run();
         };
         
         // remove comments
@@ -68,9 +60,35 @@ class Prompt {
                 }
             }
         };
-
+        
+        // call once parsing and tree building is done
         void run() {
-            if (this->ptr != NULL) {
+            bool isNull;
+            status check;
+            if (this->ptr == NULL) {
+                isNull = true;
+            } else {
+                isNull = false;
+            }
+
+            if (isNull) {
+                return;
+            } else {
+                check = this->ptr->execute();
+            }
+
+            if (check == EXIT) {
+                ptr->freeMem();
+                ptr = NULL;
+                isNull = true;
+
+                exit(0);
+            } else {
+                ptr->freeMem();
+                ptr = NULL;
+            }
+            return;
+            /*if (this->ptr != NULL) {
                 status check = this->ptr->execute();
                 
                 if (check == EXIT) {
@@ -84,7 +102,7 @@ class Prompt {
                 ptr->freeMem();
             }
 
-            ptr = NULL;
+            ptr = NULL;*/
         };
 
         void parse() {

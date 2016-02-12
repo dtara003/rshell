@@ -4,6 +4,7 @@
 #include "Shell.h"
 #include <vector>
 #include <sstream>
+#include <string>
 
 using namespace std;
 
@@ -32,8 +33,14 @@ class Command : public Shell {
 			if (cmd == "exit") {
 				return EXIT;
 			}
-								
-			//otherwise convert string to char []
+			
+			//get rid of quotation marks
+			for (int i = 0; i < cmd.size(); i++) {
+				if (cmd.at(i) == '\"') {
+					cmd.erase(i, 1);
+				}
+			}
+			//convert string to char []
 
 			unsigned int sz = 0; //will keep track of the size of the char**
 			string in = ""; //takes input from stringstream

@@ -18,12 +18,20 @@ class Connector : public Shell {
     public:
         // constructor
         Connector() {};
+
 		~Connector() {
 			delete left;
 			delete right;
 		};
-        status execute() {
-            return EXECUTED;
+
+        virtual status execute() = 0;
+
+        void freeMem() {
+            left->freeMem();
+            right->freeMem();
+
+            delete left;
+            delete right;
         };
 };
 
@@ -31,10 +39,12 @@ class Semi : public Connector {
     public:
         // constructor
         Semi() {};
+
         Semi(Shell* l, Shell* r) {
             left = l;
             right = r;
         };
+
         ~Semi() {};
 
         status execute() {
@@ -47,12 +57,11 @@ class Semi : public Connector {
 
             if (check == EXECUTED) {
                 return right->execute();
-            }
-			else if (check == EXIT) {
+            } else if (check == EXIT) {
 				return EXIT;
 			}
-			else
-				return right->execute();
+			
+            return right->execute();
         };
 };
 
@@ -69,7 +78,7 @@ class And : public Connector {
             right = r;
         };
 
-        ~And() {}
+        ~And() {};
 
 		//execute function that will perform as &&
 		status execute() {
@@ -79,12 +88,11 @@ class And : public Connector {
 
 		    if (check == EXECUTED) {
                 return right->execute();
-            }
-			else if (check == EXIT) {
+            } else if (check == EXIT) {
 				return EXIT;
 			}
-			else
-				return FAILED;
+            
+            return FAILED;
 		};
 };
 
@@ -92,6 +100,7 @@ class Or : public Connector {
 	public:
         // constructors
         Or() {};
+
 		Or(Shell* l, Shell* r) {
             left = l;
             right = r;
@@ -100,18 +109,16 @@ class Or : public Connector {
         ~Or() {};
 
 		status execute() {
-            
             //check the what left->execute() returns
             status check = left->execute();
 
             if (check == EXECUTED) {
                 return EXECUTED;
-            }
-			else if (check == EXIT) {
+            } else if (check == EXIT) {
 				return EXIT;
 			}
-			else
-				return right->execute();
+		    
+            return right->execute();
         };
 };
 

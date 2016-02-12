@@ -110,6 +110,12 @@ class Command : public Shell {
 		};
 
 		void freeMem() {
+            // this will work like a base case
+            // this is how we know we have recursed all the way to the bottom
+            // so we know that the parent node from this point and one will
+            // be a class inherited from the Connector class
+            // from there, the connector's left and right children will be
+            // deleted and this will occur all the way back up to the root
 			return;
 		};
 };

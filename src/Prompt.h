@@ -38,18 +38,23 @@ class Prompt {
             cout << "[" << user << "@" << hostname << "]$ ";          
             getline(cin, input);
             
+            // cout << "1" << endl;
+
             // exit if prompted to do so
             if (input == "exit") {
                 exit(0);
             }
             
+            // cout << "2" << endl;
+
             rmComments(input);
             
             // check
+            // cout << "3" << endl;
             // cout << "w/o comments: " << input << endl;
             
             parse();
-            //complete();
+            run();
         };
         
         // remove comments
@@ -61,7 +66,24 @@ class Prompt {
                 }
             }
         };
-	    
+
+        void run() {
+            if (this->ptr != NULL) {
+                status check = this->ptr->execute();
+                
+                if (check == EXIT) {
+                    delete ptr;
+
+                    exit(0);
+                }
+
+                delete ptr;
+                // ptr = NULL;
+            }
+
+            ptr = NULL;
+        };
+
         void parse() {
             // lines 72 - 85 probably not a viable method of interpreting
             // command line inputs
@@ -69,7 +91,12 @@ class Prompt {
             // just gets rid of starting and ending errors altogether
                 
             // remove extra spaces from start and end of input string
+            
+            // cout << "4" << endl;
+
             trim(input);
+
+            // cout << "5" << endl;
 		    
             // remove any leading or trailing connectors
             while ( (input.at(input.size() - 1) == '&') || (input.at(input.size()
@@ -77,12 +104,16 @@ class Prompt {
                 input = input.substr(0, input.size() - 2);               
                 trim(input);
             }
+
+            // cout << "6" << endl;
 		    
             while ( (input.at(0) == '&') || (input.at(0) == '|') || (input.at(0)
             == ';') ) {
                 input = input.substr(1, input.size() - 1);
                 trim(input);
-            } 
+            }
+
+            // cout << "7" << endl;
 		    
             //trim(input);
 		    
@@ -92,6 +123,9 @@ class Prompt {
             // 1 if semicolon, 2 if and, 3 if or
             unsigned int i = 0;
             bool quotes = false;
+
+            // cout << "9" << endl;
+
             while (i < input.size()) {
                 // toggles to check for quotes used for commands like echo
                 if (input.at(i) =='\"') {
@@ -102,6 +136,8 @@ class Prompt {
                     }
                 }
 		        
+                // cout << "10" << endl;
+
                 if (!quotes) {
                     if (input.at(i) == ';') {                 		            
                         if (ptr == NULL) {
@@ -281,16 +317,24 @@ class Prompt {
 		        
                 i++;
             }
+            
+            // cout << "11" << endl;
 
             // account for final command
             trim(input);
             commStrs.push_back(input);
             
-            Shell* a = new Command(commStrs.at(commStrs.size() - 1));
-            Shell *b = new Semi(ptr, a);
-            ptr = b;
-            input = "";
-                
+            if (ptr == NULL) {
+                ptr = new Command(input);
+                input = "";
+            } else {
+                Shell* a = new Command(input);
+                Shell* b = new Semi(ptr, a);
+                ptr = b;
+                input = "";
+            }
+            // `cout << "12" << endl;
+
             /* check
             for (unsigned int i = 0; i < connVals.size(); ++i) {
                 cout << connVals.at(i) << " ";
@@ -305,11 +349,11 @@ class Prompt {
             cout << input << endl;*/
         };
 		
-        void freeMem() {
+        // DEFINED WITHIN SHELL
+        /*void freeMem() {
             // DO NOT FORGET
             // FREE ANY MEMORY THAT WAS ALLOCATED
-        };
-    
+        };*/
 };
 
 #endif

@@ -12,7 +12,10 @@ using namespace std;
 int main() {
     while(1) {
         Prompt pr;
+
         pr.promptUser();
+        pr.parse();
+        pr.run();
     }
 
     return 0;

@@ -55,8 +55,8 @@ class Prompt {
             // cout << "3" << endl;
             // cout << "w/o comments: " << input << endl;
             
-            parse();
-            run();
+            //parse();
+            //run();
         };
         
         // remove comments
@@ -75,9 +75,13 @@ class Prompt {
                 
                 if (check == EXIT) {
                     ptr->freeMem();
+                    ptr = NULL;
+                    //delete ptr;
                     exit(0);
                 }
                 // cout << "you made it here" << endl;
+                //delete ptr;
+                ptr->freeMem();
             }
 
             ptr = NULL;

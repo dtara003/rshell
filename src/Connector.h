@@ -11,21 +11,28 @@ using namespace std;
 //Composite class for Connectors(&& and || and ;)
 //following same format as Lab3
 class Connector : public Shell {
-    protected:
+    public:
         Shell* left;
         Shell* right;
-    
-    public:
+
         // constructor
         Connector() {};
-
-		~Connector() {
-			delete left;
-			delete right;
-		};
+        
+        //destructor
+		~Connector() {};
 
         virtual status execute() = 0;
+        
+        // recursive destruction of tree whenever all commands are done
+        // executing or the exit command is executed
+        // must call this function before exiting for exit command or there
+        // will be a memory leak because the tree will be left behind
+        
+        // references
 
+        // daniweb.com//programming/software-development/threads/121994-
+            // recursive-binary-tree-header-file
+        // cprogramming.com/tutorial/lesson18.html
         void freeMem() {
             left->freeMem();
             right->freeMem();
@@ -38,14 +45,14 @@ class Connector : public Shell {
 class Semi : public Connector {
     public:
         // constructor
-        Semi() {};
+        //Semi() {};
 
         Semi(Shell* l, Shell* r) {
             left = l;
             right = r;
         };
 
-        //~Semi() {};
+        ~Semi() {};
 
         status execute() {
             // semicolon works so that regardless of the left
@@ -67,7 +74,7 @@ class Semi : public Connector {
 
 class And : public Connector {
 	public:
-		And() {};
+		//And() {};
 		
 		// can't use initializaion lists when setting pointers for
         // some reason -- a limitation of inheritance?
@@ -78,7 +85,7 @@ class And : public Connector {
             right = r;
         };
 
-        //~And() {};
+        ~And() {};
 
 		//execute function that will perform as &&
 		status execute() {
@@ -99,14 +106,14 @@ class And : public Connector {
 class Or : public Connector {
 	public:
         // constructors
-        Or() {};
+        //Or() {};
 
 		Or(Shell* l, Shell* r) {
             left = l;
             right = r;
         };
 
-        //~Or() {};
+        ~Or() {};
 
 		status execute() {
             //check the what left->execute() returns

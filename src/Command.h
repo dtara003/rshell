@@ -14,13 +14,14 @@ class Command : public Shell {
 		//executable), and it takes in the whole char* array
 		//for the rest of the arguments(i.e. cmd = ls -a 
 		//then cmd[0] = ls)
-
 		string cmd;
 
 	public:
 		//a constructor that takes in string arguments and converts to char**
 		Command(string c) :cmd(c) {};
-		//~Command() {};	
+		
+        ~Command() {};
+
 		//function returns true if command executed
 		status execute() {
 			
@@ -31,7 +32,9 @@ class Command : public Shell {
 			//if the string is exit then we want to return EXIT and go back to
 			//our prompt class and delete the tree and call exit(0)
 			if (cmd == "exit") {
-				return EXIT;
+                // check
+				//cout << cmd << endl;
+                return EXIT;
 			}
 		    
             // check

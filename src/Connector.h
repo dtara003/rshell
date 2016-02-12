@@ -45,7 +45,7 @@ class Semi : public Connector {
             right = r;
         };
 
-        ~Semi() {};
+        //~Semi() {};
 
         status execute() {
             // semicolon works so that regardless of the left
@@ -78,7 +78,7 @@ class And : public Connector {
             right = r;
         };
 
-        ~And() {};
+        //~And() {};
 
 		//execute function that will perform as &&
 		status execute() {
@@ -106,7 +106,7 @@ class Or : public Connector {
             right = r;
         };
 
-        ~Or() {};
+        //~Or() {};
 
 		status execute() {
             //check the what left->execute() returns

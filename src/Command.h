@@ -20,7 +20,7 @@ class Command : public Shell {
 	public:
 		//a constructor that takes in string arguments and converts to char**
 		Command(string c) :cmd(c) {};
-		~Command() {};	
+		//~Command() {};	
 		//function returns true if command executed
 		status execute() {
 			
@@ -33,13 +33,21 @@ class Command : public Shell {
 			if (cmd == "exit") {
 				return EXIT;
 			}
-			
+		    
+            // check
+            // outputs cmd and its size to find discrepencies
+            //cout << cmd << "CHECK " << cmd.size() << endl;
+
 			//get rid of quotation marks
 			for (unsigned int i = 0; i < cmd.size(); i++) {
 				if (cmd.at(i) == '\"') {
 					cmd.erase(i, 1);
 				}
 			}
+
+            // check
+            //cout << cmd << "CHECK " << cmd.size() << endl;
+
 			//convert string to char []
 
 			unsigned int sz = 0; //will keep track of the size of the char**
@@ -50,7 +58,7 @@ class Command : public Shell {
 			while (str >> in) {
 				v.push_back(in);
 			}
-			sz = v.size() + 1; //set the char** array size(including NULL)
+			sz = v.size(); //set the char** array size(including NULL)
 		
 			char* arr[1024]; //set the size of the char* array
 			
@@ -108,12 +116,14 @@ class Command : public Shell {
 
 			//get the value that the child returned(0 or 50)
 			int childReturnVal = WEXITSTATUS(status);
+            
 			if (childReturnVal == 50) {
 				//this means the command did not execute so return false
 				return FAILED;
 			}
-			else 
+			else { 
 				return EXECUTED; //command executed therefore return true
+            }
 		};
 
 		void freeMem() {

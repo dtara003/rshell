@@ -16,11 +16,13 @@ using namespace boost;
 class Prompt {
     private:
         string input;
-        Shell* ptr;
+        //Shell* ptr;
         vector <string> commStrs;
         vector <int> connVals;
       
     public:
+        Shell* ptr;
+
         Prompt() {
             ptr = NULL;
         };
@@ -72,13 +74,10 @@ class Prompt {
                 status check = this->ptr->execute();
                 
                 if (check == EXIT) {
-                    delete ptr;
-
+                    ptr->freeMem();
                     exit(0);
                 }
-
-                delete ptr;
-                // ptr = NULL;
+                // cout << "you made it here" << endl;
             }
 
             ptr = NULL;
@@ -92,16 +91,12 @@ class Prompt {
                 
             // remove extra spaces from start and end of input string
             
-            // cout << "4" << endl;
-
             trim(input);
 
-            // cout << "5" << endl;
-		    
             // remove any leading or trailing connectors
             while ( (input.at(input.size() - 1) == '&') || (input.at(input.size()
             - 1) == '|') || (input.at(input.size() - 1) == ';') ) {
-                input = input.substr(0, input.size() - 2);               
+                input = input.substr(0, input.size() - 1);               
                 trim(input);
             }
 
@@ -109,7 +104,7 @@ class Prompt {
 		    
             while ( (input.at(0) == '&') || (input.at(0) == '|') || (input.at(0)
             == ';') ) {
-                input = input.substr(1, input.size() - 1);
+                input = input.substr(1, input.size());
                 trim(input);
             }
 

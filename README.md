@@ -11,11 +11,11 @@ line one by one or as a chain of commands connected by SEMICOLONS ( ; ), AND'S
 
 To Run
 ------
-$ git clone https://github.com/dtara003/rshell.git
-$ cd rshell
-$ git checkout hw1
-$ make
-$ bin/rshell
+git clone https://github.com/dtara003/rshell.git
+cd rshell
+git checkout hw1
+make
+bin/rshell
 
 Bugs / Limitations / Notes
 -----------

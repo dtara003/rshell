@@ -17,7 +17,7 @@ $ git checkout hw1
 $ make
 $ bin/rshell
 
-Limitations
+Bugs / Limitations / Notes
 -----------
 * does not recognize the command cd
 * does not handle redirective commands such as echo "hey" > test.cpp

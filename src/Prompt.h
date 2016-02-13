@@ -105,46 +105,61 @@ class Prompt {
             ptr = NULL;*/
         };
 
+        string cut(string str) {
+            trim(str);
+
+            return str;
+        }
+
+        string cut(string str, int start, int end) {
+            return str.substr(start, end);
+        }
+
         void parse() {
-            // lines 72 - 85 probably not a viable method of interpreting
-            // command line inputs
+            // the followinf two while loops are probably not a viable method of
+            // interpreting command line inputs
             // weak method error-catching
             // just gets rid of starting and ending errors altogether
                 
             // remove extra spaces from start and end of input string
-            
-            trim(input);
+            input = cut(input);
 
             // remove any leading or trailing connectors
-            while ( (input.at(input.size() - 1) == '&') || (input.at(input.size()
-            - 1) == '|') || (input.at(input.size() - 1) == ';') ) {
-                input = input.substr(0, input.size() - 1);               
-                trim(input);
+            while ((input.at(input.size() - 1) == '&') || (input.at(input.size()
+            - 1) == '|') || (input.at(input.size() - 1) == ';')) {
+                input = cut(input, 0, input.size() - 1);               
+                input = cut(input);
             }
 
             // cout << "6" << endl;
 		    
             while ( (input.at(0) == '&') || (input.at(0) == '|') || (input.at(0)
             == ';') ) {
-                input = input.substr(1, input.size());
-                trim(input);
+                input = cut(input, 1, input.size());
+                input = cut(input);
             }
-
-            // cout << "7" << endl;
 		    
-            //trim(input);
+            input = cut(input);
 		    
             // check
             // cout << "trimmed: " << input << endl;
-		   		    
-            // 1 if semicolon, 2 if and, 3 if or
-            unsigned int i = 0;
+		    
+            // loop through entire input string and parse commands and
+            // connectors off the left end one at a time
+            // each time a command and connector are pushed into their
+            // appropriate vectors, the string is cut shorter so the next
+            // command and subsequent connector can be separated when the loop
+            // iterates again
+            // bool quotes will track whether a command's arguments are within a
+            // set of quotation marks
+            // if so, then any connector deliminators present inside will be
+            // ignored so that the argument of a command such as echo does not
+            // get parsed into multiple commands when it is simply meant to be
+            // echoed to the console
             bool quotes = false;
-
-            // cout << "9" << endl;
-
+            unsigned int i = 0;
             while (i < input.size()) {
-                // toggles to check for quotes used for commands like echo
+                // toggles to check for quotes
                 if (input.at(i) =='\"') {
                     if (!quotes) {
                         quotes = true;
@@ -152,182 +167,105 @@ class Prompt {
                         quotes = false;
                     }
                 }
-		        
-                // cout << "10" << endl;
 
                 if (!quotes) {
-                    if (input.at(i) == ';') {                 		            
-                        if (ptr == NULL) {
-                            // this is the first Command being created
-                            // create Command object of everything up until that
-                            // semicolon
-                            string temp = input.substr(0, i);
-                            trim(temp);
-                   
-                            ptr = new Command(temp);
-                            
-                            commStrs.push_back(temp);
-
-                            input = input.substr(i + 1, input.size() - 1);
-
-                            // check
-                            // cout << input << endl;
-
+                    if (ptr == NULL) {
+                        if (input.at(i) == ';') {
+                            ptr = new Command(cut(cut(input, 0, i)));
+                            commStrs.push_back(cut(cut(input, 0, i)));
+                            input = cut(input, i + 1, input.size() - 1);
                             i = 0;
                             connVals.push_back(1);
-                        } else {
-                            if (connVals.at(connVals.size() - 1) == 1) {
-                                // need new pointer variable to hold new connector
-                                // object
-                                string temp = input.substr(0, i);
-                                trim(temp);
-                                Shell* a = new Command(temp);
-                                commStrs.push_back(temp);
-
-                                input = input.substr(i + 1, input.size() - 1);
-                                // cout << input << endl;
-                                Shell* b = new Semi(ptr, a);
-                                
-                                // Shell* pointer now points to semicolon
-                                ptr = b;
-                                i = 0;
-                                connVals.push_back(1);
-                            } else if (connVals.at(connVals.size() - 1) == 2) {
-                                string temp = input.substr(0, i);
-                                trim(temp);
-                                
-                                Shell* a = new Command(temp);
-                                commStrs.push_back(temp);
-
-                                input = input.substr(i + 1, input.size() - 1);
-                                // cout << input << endl;
-                                Shell* b = new And(ptr, a);
-    
-                                ptr = b;
-                                i = 0;
-                                connVals.push_back(1);
-                            } else if (connVals.at(connVals.size() - 1) == 3) {
-                                string temp = input.substr(0, i);
-                                trim(temp);
-                                Shell* a = new Command(temp);
-                                commStrs.push_back(temp);
-
-                                input = input.substr(i + 1, input.size() - 1);
-                                // cout << input << endl;
-                                Shell* b = new Or(ptr, a);
-    
-                                ptr = b;
-                                i = 0;
-                                connVals.push_back(1);
-                            }
-                        }
-                    } else if (input.at(i) == '&' && input.at(i + 1) == '&') {    		            
-                        if (ptr == NULL) {
-                            // create Command object of everything up until the
-                            // and symbols
-                            string temp = input.substr(0, i);
-                            trim(temp);
-
-                            ptr = new Command(temp);
-                            commStrs.push_back(temp);
-                            
-                            input = input.substr(i + 2, input.size() - 1);
-                            // cout << input << endl;
+                        } else if ((input.at(i) == '&') && (input.at(i + 1) == '&')) {
+                            ptr = new Command(cut(cut(input, 0, i)));
+                            commStrs.push_back(cut(cut(input, 0, i)));
+                            input = cut(input, i + 2, input.size() - 1);
                             i = 0;
                             connVals.push_back(2);
-                        } else {
+                        } else if ((input.at(i) == '|') && (input.at(i + 1) == '|')) {
+                            ptr = new Command(cut(cut(input, 0, i)));
+                            commStrs.push_back(cut(cut(input, 0, i)));
+                            input = cut(input, i + 2, input.size() - 1);
+                            i = 0;
+                            connVals.push_back(3);
+                        }
+                    } else {
+                        if (input.at(i) == ';') {
                             if (connVals.at(connVals.size() - 1) == 1) {
-                                string temp = input.substr(0, i);
-                                trim(temp);
-                                Shell* a = new Command(temp);
-                                commStrs.push_back(temp);
-
-                                input = input.substr(i + 2, input.size() - 1);
-                                // cout << input << endl;
+                                Shell* a = new Command(cut(cut(input, 0, i)));
+                                commStrs.push_back(cut(cut(input, 0, i)));
                                 Shell* b = new Semi(ptr, a);
-
                                 ptr = b;
+                                input = cut(input, i + 1, input.size() - 1);
                                 i = 0;
-                                connVals.push_back(2);
+                                connVals.push_back(1);
                             } else if (connVals.at(connVals.size() - 1) == 2) {
-                                string temp = input.substr(0, i);
-                                trim(temp);
-                                Shell* a = new Command(temp);
-                                commStrs.push_back(temp);
-
-                                input = input.substr(i + 2, input.size() - 1);
-                                // cout << input << endl;
+                                Shell* a = new Command(cut(cut(input, 0, i)));
+                                commStrs.push_back(cut(cut(input, 0, i)));
                                 Shell* b = new And(ptr, a);
-    
                                 ptr = b;
+                                input = cut(input, i + 1, input.size() - 1);
+                                i = 0;
+                                connVals.push_back(1);
+
+                            } else if (connVals.at(connVals.size() - 1) == 3) {
+                                Shell* a = new Command(cut(cut(input, 0, i)));
+                                commStrs.push_back(cut(cut(input, 0, i)));
+                                Shell* b = new Or(ptr, a);
+                                ptr = b;
+                                input = cut(input, i + 1, input.size() - 1);
+                                i = 0;
+                                connVals.push_back(1); 
+                            }
+                        } else if ((input.at(i) == '&') && (input.at(i + 1) == '&')) {
+                            if (connVals.at(connVals.size() - 1) == 1) {
+                                Shell* a = new Command(cut(cut(input, 0, i)));
+                                commStrs.push_back(cut(cut(input, 0, i)));
+                                Shell* b = new Semi(ptr, a);
+                                ptr = b;
+                                input = cut(input, i + 2, input.size() - 1);
+                                i = 0;
+                                connVals.push_back(2);  
+                            } else if (connVals.at(connVals.size() - 1) == 2) {
+                                Shell* a = new Command(cut(cut(input, 0, i)));
+                                commStrs.push_back(cut(cut(input, 0, i)));
+                                Shell* b = new And(ptr, a);
+                                ptr = b;
+                                input = cut(input, i + 2, input.size() - 1);
                                 i = 0;
                                 connVals.push_back(2);
                             } else if (connVals.at(connVals.size() - 1) == 3) {
-                                string temp = input.substr(0, i);
-                                trim(temp);
-                                Shell* a = new Command(temp);
-                                commStrs.push_back(temp);
-                                
-                                input = input.substr(i + 2, input.size() - 1);
-                                // cout << input << endl;
+                                Shell* a = new Command(cut(cut(input, 0, i)));
+                                commStrs.push_back(cut(cut(input, 0, i)));
                                 Shell* b = new Or(ptr, a);
-    
                                 ptr = b;
+                                input = cut(input, i + 2, input.size() - 1);
                                 i = 0;
                                 connVals.push_back(2);
                             }
-                        }
-                    } else if (input.at(i) == '|' && input.at(i + 1) == '|') {   
-                        if (ptr == NULL) {
-                            // create Command object of everything up until the
-                            // or symbol
-                            string temp = input.substr(0, i);
-                            trim(temp);
-                            ptr = new Command(temp);
-                            commStrs.push_back(temp);
-
-                            input = input.substr(i + 2, input.size() - 1);
-                            // cout << input << endl;
-                            i = 0;
-                            connVals.push_back(3);
-                        } else {
-                            if (connVals.at(connVals.size() - 1) == 1) {
-                                string temp = input.substr(0, i);
-                                trim(temp);
-                                Shell* a = new Command(temp);
-                                commStrs.push_back(temp);
-
-                                input = input.substr(i + 2, input.size() - 1);
-                                // cout << input << endl;
+                        } else if ((input.at(i) == '|') && (input.at(i + 1) == '|')) {
+                            if (connVals.at(connVals.size() - 1) == 1) { 
+                                Shell* a = new Command(cut(cut(input, 0, i)));
+                                commStrs.push_back(cut(cut(input, 0, i)));
                                 Shell* b = new Semi(ptr, a);
-    
                                 ptr = b;
+                                input = cut(input, i + 2, input.size() - 1);
                                 i = 0;
                                 connVals.push_back(3);
                             } else if (connVals.at(connVals.size() - 1) == 2) {
-                                string temp = input.substr(0, i);
-                                trim(temp);
-                                Shell* a = new Command(temp);
-                                commStrs.push_back(temp);
-
-                                input = input.substr(i + 2, input.size() - 1);
-                                // cout << input << endl;
+                                Shell* a = new Command(cut(cut(input, 0, i)));
+                                commStrs.push_back(cut(cut(input, 0, i)));
                                 Shell* b = new And(ptr, a);
-    
                                 ptr = b;
+                                input = cut(input, i + 2, input.size() - 1);
                                 i = 0;
                                 connVals.push_back(3);
                             } else if (connVals.at(connVals.size() - 1) == 3) {
-                                string temp = input.substr(0, i);
-                                trim(temp);
-                                Shell* a = new Command(temp);
-                                commStrs.push_back(temp);
-
-                                input = input.substr(i + 2, input.size() - 1);
-                                // cout << input << endl;
+                                Shell* a = new Command(cut(cut(input, 0, i)));
+                                commStrs.push_back(cut(cut(input, 0, i)));
                                 Shell* b = new Or(ptr, a);
-    
                                 ptr = b;
+                                input = cut(input, i + 2, input.size() - 1);
                                 i = 0;
                                 connVals.push_back(3);
                             }

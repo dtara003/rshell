@@ -12,17 +12,27 @@ line one by one or as a chain of commands connected by SEMICOLONS ( ; ), AND'S
 
 #Limitations
 
-- does not recognize the command cd
+does not recognize the command cd
+
+follows STRICT connector format:
 - more than one semicolon between two commands is treated as if the user is
   running blank commands in between
     - ls -a;;; mkdir direct
         - runs the command ls -a, two blank commands in between the three
           semicolons, and then mkdir direct
 - AND and OR connectors are detected in groups of two only
-    - ls -a && mkdir direct
-        - runs mkdir direct if ls -a executes and does no return an EXECUTED
-          status
     - ls -a & mkdir direct
         - does not recognize a single & as a connector and will try to execute
-          the entirety of ls -a & mkdir direct as one command, outputting an
-          returning a 
+          the entirety of ls -a & mkdir direct as one command, outputting a
+          FAILED status
+    - ls -a | mkdir direct
+        - does not recognize a single | as a connector and will try to execute
+          the entirety of the command chain shown as one command
+    - ls -a &&& mkdir direct
+        - will execute ls -a, separate the second command from &&, and return a
+          FAILED status after attempting to execute & mkdir direct
+    - any amount of extra & or | symbols will be processed as if part of the
+      second command and will cause the second command to output an error
+    - a mix of & and | symbols will output errors
+
+

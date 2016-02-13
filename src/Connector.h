@@ -88,6 +88,7 @@ class And : public Connector {
         ~And() {};
 
 		//execute function that will perform as &&
+        //executes right child if the left child returns true
 		status execute() {
 			
 			//check the status of the left->execute()
@@ -114,7 +115,8 @@ class Or : public Connector {
         };
 
         ~Or() {};
-
+        
+        // Or only executes the right child if the left child returns false
 		status execute() {
             //check the what left->execute() returns
             status check = left->execute();

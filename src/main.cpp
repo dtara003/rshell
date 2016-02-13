@@ -10,6 +10,7 @@
 using namespace std;
 
 int main() {
+    //infinite loop until exit command called
     while(1) {
         Prompt pr;
 

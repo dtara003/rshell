@@ -167,22 +167,26 @@ class Prompt {
                         quotes = false;
                     }
                 }
-
+                
+                // if not waiting for closing quotations then parse
                 if (!quotes) {
                     if (ptr == NULL) {
+                        // first command pointer
                         if (input.at(i) == ';') {
                             ptr = new Command(cut(cut(input, 0, i)));
                             commStrs.push_back(cut(cut(input, 0, i)));
                             input = cut(input, i + 1, input.size() - 1);
                             i = 0;
                             connVals.push_back(1);
-                        } else if ((input.at(i) == '&') && (input.at(i + 1) == '&')) {
+                        } else if ((input.at(i) == '&') && (input.at(i + 1) ==
+                        '&')) {
                             ptr = new Command(cut(cut(input, 0, i)));
                             commStrs.push_back(cut(cut(input, 0, i)));
                             input = cut(input, i + 2, input.size() - 1);
                             i = 0;
                             connVals.push_back(2);
-                        } else if ((input.at(i) == '|') && (input.at(i + 1) == '|')) {
+                        } else if ((input.at(i) == '|') && (input.at(i + 1) ==
+                        '|')) {
                             ptr = new Command(cut(cut(input, 0, i)));
                             commStrs.push_back(cut(cut(input, 0, i)));
                             input = cut(input, i + 2, input.size() - 1);
@@ -190,6 +194,9 @@ class Prompt {
                             connVals.push_back(3);
                         }
                     } else {
+                        // if this is n't the first object to be created then
+                        // make the new object and then incrporate it into the
+                        // tree
                         if (input.at(i) == ';') {
                             if (connVals.at(connVals.size() - 1) == 1) {
                                 Shell* a = new Command(cut(cut(input, 0, i)));
@@ -217,7 +224,8 @@ class Prompt {
                                 i = 0;
                                 connVals.push_back(1); 
                             }
-                        } else if ((input.at(i) == '&') && (input.at(i + 1) == '&')) {
+                        } else if ((input.at(i) == '&') && (input.at(i + 1) ==
+                        '&')) {
                             if (connVals.at(connVals.size() - 1) == 1) {
                                 Shell* a = new Command(cut(cut(input, 0, i)));
                                 commStrs.push_back(cut(cut(input, 0, i)));
@@ -243,7 +251,8 @@ class Prompt {
                                 i = 0;
                                 connVals.push_back(2);
                             }
-                        } else if ((input.at(i) == '|') && (input.at(i + 1) == '|')) {
+                        } else if ((input.at(i) == '|') && (input.at(i + 1) ==
+                        '|')) {
                             if (connVals.at(connVals.size() - 1) == 1) { 
                                 Shell* a = new Command(cut(cut(input, 0, i)));
                                 commStrs.push_back(cut(cut(input, 0, i)));
@@ -276,23 +285,19 @@ class Prompt {
                 i++;
             }
             
-            // cout << "11" << endl;
-
             // account for final command
-            trim(input);
-            commStrs.push_back(input);
+            commStrs.push_back(cut(input));
             
             if (ptr == NULL) {
-                ptr = new Command(input);
+                ptr = new Command(cut(input));
                 input = "";
             } else {
-                Shell* a = new Command(input);
+                Shell* a = new Command(cut(input));
                 Shell* b = new Semi(ptr, a);
                 ptr = b;
                 input = "";
             }
-            // `cout << "12" << endl;
-
+            
             /* check
             for (unsigned int i = 0; i < connVals.size(); ++i) {
                 cout << connVals.at(i) << " ";

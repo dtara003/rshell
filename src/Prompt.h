@@ -293,9 +293,20 @@ class Prompt {
                 input = "";
             } else {
                 Shell* a = new Command(cut(input));
-                Shell* b = new Semi(ptr, a);
-                ptr = b;
-                input = "";
+                
+                if (connVals.at(connVals.size() - 1) == 1) {
+                    Shell* b = new Semi(ptr, a);
+                    ptr = b;
+                    input = "";
+                } else if (connVals.at(connVals.size() - 1) == 2) {
+                    Shell* b = new And(ptr, a);
+                    ptr = b;
+                    input = "";
+                } else if (connVals.at(connVals.size() - 1) == 3) {
+                    Shell* b = new Or(ptr, a);
+                    ptr = b;
+                    input = "";
+                }
             }
             
             /* check

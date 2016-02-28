@@ -5,7 +5,7 @@
 #include <vector>
 #include <sstream>
 #include <string>
-
+#include <errno.h>
 using namespace std;
 
 class Command : public Shell {
@@ -91,36 +91,32 @@ class Command : public Shell {
 				//we also want this whole function(execute)
 				//to return false(FAILED)
 				//if the command in execvp did not execute
-				if (execvp(arr[0],arr) == -1) {
+				if (execvp(arr[0],arr) < 0) {
 
 					//print out error message
 					perror("Error");
-					
-					//we can put any number(I think) and when this child process
-					//terminates(through exit) it should return a number
-					//and we can use WEXITSTATUS to get the number 50
-					exit(50);
+					//errno should be set based on the error
+					exit(errno);
 				}
 
-				//if the command executed then we exit with 0
-				exit(0);
+				//if the command executed then we exit with 0(errno should be
+				//set to 0)
+				exit(errno);
 			}
 
 			//parent will have a pid > 0
 
 			//now we want to check what value the child returned(either a 50
-			//or 0). A 50 indicates that the execvp failed to execute and
-			//therefore we want to return false in this execute function
+			//or 0). A 50 indicates that
 				
 			int status = 0;
 				
 			//wait for child to terminate(prevent "zombie" processes)
 			wait(&status);
-
-			//get the value that the child returned(0 or 50)
-			int childReturnVal = WEXITSTATUS(status);
             
-			if (childReturnVal == 50) {
+            //WIFEXITED() macro checks if the child process terminated properly
+            //or not
+			if (WIFEXITED(status)) {
 				//this means the command did not execute so return false
 				return FAILED;
 			}

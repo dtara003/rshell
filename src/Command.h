@@ -116,7 +116,7 @@ class Command : public Shell {
             
             //WIFEXITED() macro checks if the child process terminated properly
             //or not
-			if (WIFEXITED(status)) {
+			if (WEXITSTATUS(status) > 0) {
 				//this means the command did not execute so return false
 				return FAILED;
 			}

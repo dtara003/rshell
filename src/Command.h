@@ -2,6 +2,7 @@
 #define COMMAND_H
 
 #include "Shell.h"
+#include <sys/stat.h>
 #include <vector>
 #include <sstream>
 #include <string>
@@ -10,21 +11,18 @@ using namespace std;
 
 class Command : public Shell {
 	private:
-		//execvp takes two arguments: cmd[0](which is the
-		//executable), and it takes in the whole char* array
-		//for the rest of the arguments(i.e. cmd = ls -a 
-		//then cmd[0] = ls)
+		//string datamember
 		string cmd;
 
 	public:
-		//a constructor that takes in string arguments and converts to char**
 		Command(string c) :cmd(c) {};
 		
         ~Command() {};
 
-		//function returns true if command executed
+		//function returns EXECUTED if command executed
 		status execute() {
 			
+			struct stat buf;
 			//check if the string is "exit"
 			//we need a special case for this because execvp does not
 			//take exit as a command
@@ -35,23 +33,165 @@ class Command : public Shell {
                 // check
 				//cout << cmd << endl;
                 return EXIT;
-			}
-		    
-            // check
-            // outputs cmd and its size to find discrepencies
-            //cout << cmd << "CHECK " << cmd.size() << endl;
-
-			//get rid of quotation marks
+			}			
+			
+			//get rid of quotation marks(for cases like echo "hello")
 			for (unsigned int i = 0; i < cmd.size(); i++) {
 				if (cmd.at(i) == '\"') {
 					cmd.erase(i, 1);
 				}
 			}
+			
+			//test command
+			if (cmd.substr(0,5) == "test ") {
+				cmd.erase(0,5);
+				if (cmd.substr(0,2) == "-d") {
+					cmd.erase(0,3);
+					if (cmd.length() == 0) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					const char* path = cmd.c_str();
+					stat(path, &buf);
+					if (S_ISDIR(buf.st_mode)) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					else {
+						cout << "(False)" << endl;
+						return FAILED;
+					}
+				}
+				else if (cmd.substr(0,2) == "-f") {
+					cmd.erase(0,3);
+					if (cmd.length() == 0) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					const char* path = cmd.c_str();
+					stat(path, &buf);
+					if (S_ISREG(buf.st_mode)) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					else {
+						cout << "False" << endl;
+						return FAILED;
+					}
+				}
+				else if (cmd.substr(0,2) == "-e") {
+					cmd.erase(0,3);
+					if (cmd.length() == 0) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					const char* path = cmd.c_str();
+					if (stat(path, &buf) == 0) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					else {
+						cout << "(False)" << endl;
+						return FAILED;
+					}
+				}
+				else {
+					if (cmd.length() == 0) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					const char* path = cmd.c_str();
+					if (stat(path, &buf) == 0) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					else {
+						cout << "(False)" << endl;
+						return FAILED;
+					}
+				}
+				
+			}
 
-            // check
-            //cout << cmd << "CHECK " << cmd.size() << endl;
+			//test command(square brackets)
+			if (cmd.substr(0,1) == "[") {
+				if (cmd.length() >= 2) {
+					if (cmd.substr(cmd.length() - 1, 1) != "]") {
+						cout << "[: missing \']\'" << endl;
+						return FAILED;
+					}
+					cmd.erase(0,2);
+				}
+				if (cmd.length() > 1)
+					cmd.erase(cmd.length() - 2, 2);
+				if (cmd.substr(0,2) == "-d") {
+					cmd.erase(0,3);
+					if(cmd.length() == 0) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					const char* path = cmd.c_str();
+					stat(path, &buf);
+					if (S_ISDIR(buf.st_mode)) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					else {
+						cout << "(False)" << endl;
+						return FAILED;
+					}
+				}
+				else if (cmd.substr(0,2) == "-f") {
+					cmd.erase(0,3);
+					if (cmd.length() == 0) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					const char* path = cmd.c_str();
+					stat(path, &buf);
+					if (S_ISREG(buf.st_mode)) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					else {
+						cout << "(False)" << endl;
+						return FAILED;
+					}
+				}
+				else if (cmd.substr(0,2) == "-e") {
+					cmd.erase(0,3);
+					if (cmd.length() == 0) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					const char* path = cmd.c_str();
+					if (stat(path, &buf) == 0) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					else {
+						cout << "(False)" << endl;
+						return FAILED;
+					}
+				}
+				else {
+					if (cmd.length() == 0) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					const char* path = cmd.c_str();
+					if (stat(path, &buf) == 0) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					else {
+						cout << "(False)" << endl;
+						return FAILED;
+					}
+				}
+			}
 
-			//convert string to char []
+			//convert string to char* [](for execvp)
 
 			unsigned int sz = 0; //will keep track of the size of the char**
 			string in = ""; //takes input from stringstream
@@ -77,7 +217,7 @@ class Command : public Shell {
 			
 			//if pid < 0 then the fork failed
 			if (pid < 0) {
-				perror("Fork failed");
+				perror("Fork failed");				
 			}
 			
 			//child will return a pid of 0
@@ -105,25 +245,21 @@ class Command : public Shell {
 			}
 
 			//parent will have a pid > 0
-
-			//now we want to check what value the child returned(either a 50
-			//or 0). A 50 indicates that
 				
 			int status = 0;
 				
 			//wait for child to terminate(prevent "zombie" processes)
 			wait(&status);
             
-            //WIFEXITED() macro checks if the child process terminated properly
-            //or not
 			if (WEXITSTATUS(status) > 0) {
-				//this means the command did not execute so return false
+				//this means the command did not execute so return FAILED
 				return FAILED;
 			}
 			else { 
-				return EXECUTED; //command executed therefore return true
-            }
-		};
+				return EXECUTED; //command executed therefore return EXECUTED
+			}
+		
+	};
 
 		void freeMem() {
             // this will work like a base case

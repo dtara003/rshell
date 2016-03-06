@@ -43,6 +43,10 @@ class Command : public Shell {
 			}
 			
 			//test command
+			if (cmd.substr(0,4) == "test" && cmd.length() == 4) {
+				cout << "(False)" << endl;
+				return FAILED;
+			}
 			if (cmd.substr(0,5) == "test ") {
 				cmd.erase(0,5);
 				if (cmd.substr(0,2) == "-d") {

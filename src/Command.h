@@ -24,7 +24,7 @@ class Command : public Shell {
 
 		//function returns true if command executed
 		status execute() {
-			
+		    cout << "passed into execute function: " << cmd << endl;	
 			//check if the string is "exit"
 			//we need a special case for this because execvp does not
 			//take exit as a command

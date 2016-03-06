@@ -18,7 +18,7 @@ using namespace std;
 
 class Shell {
 	public:
-		// constructor
+       	// constructor
         // literally only needed for the pointer that points to root
         // at all times
         Shell() {};
@@ -36,6 +36,30 @@ class Shell {
         // reference link for function that deconstructs tree alongside
         // the destructor
         virtual void freeMem() = 0;
+};
+
+class Precedence : public Shell {
+    public:
+        Shell* sub;
+        
+        //constructors
+        Precedence() {};
+        Precedence(Shell* s)
+            : sub(s)
+        {};
+
+        //destructor
+        //FIXME: does it need to have a body when a body is already defined
+        //in freeMem()?
+        ~Precedence() {};
+        
+        void freeMem() {
+            delete sub;
+        };
+        
+        status execute() {
+            return sub->execute();
+        };
 };
 
 #endif

@@ -22,6 +22,7 @@ class Connector : public Shell {
 		~Connector() {};
 
         virtual status execute() = 0;
+        virtual void output() = 0;
         
         // recursive destruction of tree whenever all commands are done
         // executing or the exit command is executed
@@ -50,6 +51,11 @@ class Semi : public Connector {
         Semi(Shell* l, Shell* r) {
             left = l;
             right = r;
+        };
+
+        void output() {
+            cout << "SEMI LEFT: "; left->output();
+            cout << "SEMI RIGHT: "; right->output();
         };
 
         ~Semi() {};
@@ -85,6 +91,12 @@ class And : public Connector {
             right = r;
         };
 
+        void output() {
+            cout << "AND LEFT: "; left->output();
+            cout << "AND RIGHT: "; right->output();
+        };
+
+
         ~And() {};
 
 		//execute function that will perform as &&
@@ -113,6 +125,12 @@ class Or : public Connector {
             left = l;
             right = r;
         };
+
+        void output() {
+            cout << "OR LEFT: "; left->output();
+            cout << "OR RIGHT: "; right->output();
+        };
+
 
         ~Or() {};
         

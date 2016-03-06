@@ -19,12 +19,16 @@ class Command : public Shell {
 	public:
 		//a constructor that takes in string arguments and converts to char**
 		Command(string c) :cmd(c) {};
+
+        void output() {
+            cout << cmd << endl;
+        };
 		
         ~Command() {};
 
 		//function returns true if command executed
 		status execute() {
-		    cout << "passed into execute function: " << cmd << endl;	
+		    //cout << "CHECK: command passed into execute(): " << cmd << endl;	
 			//check if the string is "exit"
 			//we need a special case for this because execvp does not
 			//take exit as a command

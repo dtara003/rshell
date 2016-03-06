@@ -17,6 +17,7 @@ int main() {
         pr.promptUser();
         pr.parse();
         pr.run();
+        //pr.outputTree();
     }
 
     return 0;

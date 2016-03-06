@@ -31,7 +31,7 @@ class Shell {
 		//that executed as executed  && failed to execute
 		//will return a false)
 		virtual status execute() = 0;
-
+        virtual void output() = 0;
         // www.cprogramming.com/tutorial/lesson18.html
         // reference link for function that deconstructs tree alongside
         // the destructor

@@ -44,3 +44,10 @@ Bugs / Limitations / Notes
           FAILED status after attempting to execute & mkdir direct
     * any amount of extra & or | symbols will be processed as if part of the
       second command and will cause the second command to output an error
+* segfault occurs when an entire string of commands is encapsulated in
+  parentheses
+	* (echo A && echo B) results in a segfault
+* use of semicolons with or without a space after a closing parenthesis causes 
+the program to abort after going out of range
+	* echo A && (echo B; echo C); echo D results in an out of range error
+* pressing tab and then enter results in an error

@@ -109,223 +109,18 @@ class Prompt {
             return str.substr(start, end);
         };
 
-        void extendTree(Shell* a, int connVal, Shell* &root)
-        {
-            Shell* d;
-            if (connVal == 2)
-            {
-                d = new And(root, a);
-                root = d;
-            }
-            else if (connVal == 3)
-            {
-                d = new Or(root, a);
-                root = d;
-            }
-            else if (connVal == 1)
-            {
-                d = new Semi(root, a);
-                root = d;
-            }
-        };
-
-        Shell* nested(string inp)
-        {
-            int connVal = 0;
-            bool moreComms = false;
-            string op;
-            //Shell* a;
-            //Shell* b;
-            Shell* subRoot = 0;
-            for (unsigned i = 0; i < inp.size(); ++i)
-            {
-                if (inp.at(i) == '(')
-                {
-                    unsigned parentheses = 1;
-                    for(unsigned j = i + 1; parentheses != 0 && j < inp.size(); ++ j)
-                    {
-                        if (inp.at(j) == '(')
-                        {
-                            parentheses++;
-                        }
-                        else if (inp.at(j) == ')')
-                        {
-                            parentheses--;
-                        }
-                        if (parentheses == 0)
-                        {
-                            string str_a = inp.substr(i+1, j-i-1);
-                            Shell *a = nested(str_a);
-                            inp = inp.substr(j+1, inp.size()-1);
-                            i = 0;
-                            if (subRoot == 0)
-                            {
-                                subRoot = a;
-                            }
-                            else
-                            {
-                                extendTree(a, connVal, subRoot);
-                            }
-                            if (inp.size() != 0)
-                            {
-                                for (unsigned k = 0; inp.size() + 1 > k; ++k)
-                                {
-                                    if (inp.at(k) == '&' && inp.at(k+1) == '&')
-                                    {
-                                       connVal = 2;
-                                       moreComms = true;
-                                    }
-                                    else if ((inp.at(k) == '|') && (inp.at(k+1) == '|'))
-                                    {
-                                        connVal = 3;
-                                        moreComms = true;
-                                    }
-                                    else if (inp.at(k) == ';')
-                                    {
-                                        connVal = 1;
-                                        inp = inp.substr(k+1, inp.size()-1);
-                                    }
-                                    if (moreComms)
-                                    {
-                                        if (inp.size() > k+2)
-                                        {
-                                            inp = inp.substr(k+2, inp.size());
-                                        }
-                                        else
-                                        {
-                                            inp = " ";
-                                        }
-                                        k = 0;
-                                    }
-                                    if (moreComms) break; 
-                                }
-                                moreComms = false;
-                            }
- 
-                        }
-                    }
-                }
-                //run parsing for && || and ; but creating a
-                //Parentheses Class and adding it to tree;
-                if (inp.size() == 0) break;
-                if (inp.at(i) == '&' && inp.at(i+1) == '&')
-                {
-                    moreComms = true;
-                    //empty list check to create first node
-                    if (subRoot == 0)
-                    {
-                        op = inp.substr(0, i);
-                        subRoot = new Command(op);
-                        connVal = 2;
-                    }
-                    //creates operator Shelld on what was last seen and
-                    //updates what operator was last seen while creating
-                    //the operator
-                    else
-                    {
-                        op = inp.substr(0, i);
-                        Shell* a = new Command(op);
-                        extendTree(a, connVal, subRoot);
-                        connVal = 2;
-                    }
-                }
-                //all parts same as and parse
-                else if (inp.at(i) == '|' && inp.at(i+1) == '|')
-                {
-                    moreComms = true;
-                    if (subRoot == 0)
-                    {
-                        op = inp.substr(0, i);
-                        subRoot = new Command(op);
-                        connVal = 3;
-                    }
-                    else
-                    {
-                        op = inp.substr(0, i);
-                        Shell* a = new Command(op);
-                        extendTree(a, connVal, subRoot);
-                        connVal = 3;
-                    }
-
-                }
-                //all parts same as and parse
-                else if (inp.at(i) == ';')
-                {
-                    if (subRoot == 0)
-                    {
-                        op = inp.substr(0, i);
-                        inp = inp.substr(i+1, inp.size()-1);
-                        i = 0;
-                        subRoot = new Command(op);
-                        connVal = 1;
-                    }
-                    else
-                    {
-                        op = inp.substr(0, i);
-                        inp = inp.substr(i+1, inp.size());
-                        i = 0;
-                        Shell* a = new Command(op);
-                        extendTree(a, connVal, subRoot);
-                        connVal = 1;
-                    }
-
-                }
-                if (moreComms)
-                {
-                    if (inp.size() > i+2)
-                    {
-                        moreComms = false;
-                        inp = inp.substr(i+2, inp.size());
-                    }
-                    else
-                    {
-                        inp = " ";
-                    }
-                    i = 0;
-                }
-            }
-
-            if (subRoot == 0)
-            {
-                subRoot= new Command(inp);
-            }
-            //creates operator if node already exists
-            else
-            {
-                Shell* a = new Command(inp);
-                if (connVal == 2)
-                {
-                    Shell* b = new And(subRoot, a);
-                    subRoot = b;
-                }
-                else if (connVal == 3)
-                {
-                    Shell* b = new Or(subRoot, a);
-                    subRoot = b;
-                }
-                else if (connVal == 1)
-                {
-                    Shell* b = new Semi(subRoot, a);
-                    subRoot = b;
-                }
-            }
- 
-            return subRoot;
-        };
-
-        void parse()
-        {
-            string op;
+        void parse() {
             int parentheses = 0;
             int connVal = 0;
             bool moreCommands = false;
-            
+            ptr = NULL; 
             unsigned int i = 0;
             int numParen = 0;
+       
             for (i = 0; i < input.size(); ++i) {
                 if (input.at(i) == '(') {
                     numParen++;
-                }
+                }//  else if (input.at(i) == ')') {
                 else if (input.at(i) == ')') {
                     numParen--;
                 }
@@ -354,24 +149,18 @@ class Prompt {
 
             i = 0;
 
-            while (i < input.size() - 1)
-            {
-                if (input.at(i) == '(')
-                {
+            while (i < input.size() - 1) {
+                if (input.at(i) == '(') {
                     parentheses++;
 
                     unsigned int j = i;
                     j++;
 
-                    while (parentheses != 0)
-                    {
-                        if (input.at(j) == '(')
-                        {
+                    while (parentheses != 0) {
+                        if (input.at(j) == '(') {
                             parentheses++;
                             numParen = parentheses;
-                        }
-                        else if (input.at(j) == ')')
-                        {
+                        } else if (input.at(j) == ')') {
                             parentheses--;
                             numParen = parentheses;
                         }
@@ -379,162 +168,466 @@ class Prompt {
                         if (parentheses == 0)
                         {
                             pos = j;
-                            string str_a = input.substr(i+1, j-i-1);
-                            Shell* a = nested(str_a);
-                            input = input.substr(pos + 1, input.size()-1);
-                            i = 0;
-                            if (ptr == 0)
-                            {
-                                ptr = a;
+                            Shell* a = nested(cut(input, i + 1, j - i - 1));
+                            input = cut(input, pos + 1, input.size() - 1);
+                            i = 1;
+                            i -= 1;
+
+                            if (ptr != NULL){
+                                Shell* c = NULL;
+                                if (connVal == 1) {
+                                    c = new Semi(ptr, a);
+                                } else if (connVal == 2) {
+                                    c = new And(ptr, a);
+                                } else if (connVal == 3) {
+                                    c = new Or(ptr, a);
+                                }
+                                
+                                ptr = c;
                             }
-                            else
-                            {
-                                extendTree(a, connVal, ptr);
+                            else {
+                                ptr = a;
                             }
                             if (input.size() != 0)
                             {
-                                for (unsigned k = 0; input.size() + 1 > k; ++k)
-                                {
-                                    if (input.at(k) == '&' && input.at(k+1) == '&')
-                                    {
-                                       connVal = 2;
-                                       moreCommands = true;
-                                    }
-                                    else if ((input.at(k) == '|') && (input.at(k+1) == '|'))
-                                    {
-                                        connVal = 3;
-                                        moreCommands = true;
-                                    }
-                                    else if (input.at(k) == ';')
-                                    {
-                                        connVal = 1;
-                                        input = input.substr(k+1, input.size()-1);
-                                    }
-                                    if (moreCommands)
-                                    {
-                                        if (input.size() > k+2)
-                                        {
-                                            input = input.substr(k+2, input.size());
-                                        }
-                                        else
-                                        {
-                                            input = " ";
-                                        }
-                                        k = 0;
-                                    }
-                                    if (moreCommands) break; 
+                                unsigned int k = 5;
+                                while (k != 0) {
+                                    k--;
                                 }
-                                moreCommands = false;
+
+                                while (k < input.size() + 1) {
+                                    if (input.at(k) == ';') {
+                                        connVal = 1;
+                                        int start = k + 1;
+                                        int end = input.size() - 1;
+                                        input = cut(input, start, end);
+                                    } else if (input.at(k) == '&' && input.at(k + 1) == '&') {
+                                        connVal = 2;
+                                        moreCommands = true;
+
+                                        if (k + 2 >= input.size()) {
+                                            input.erase(input.begin(), input.end());
+                                            moreCommands = true;
+                                            k = 0;
+                                        } else {
+                                            input = cut(input, k + 2, input.size());
+                                            moreCommands = true;
+                                            k = 0;
+                                        }
+                                    } else if (input.at(k) == '|' && input.at(k + 1) == '|') {
+                                        connVal = 3;
+                                        
+                                        if (k + 2 >= input.size()) {
+                                            input.erase(input.begin(), input.end());
+                                            moreCommands = true;
+                                            k = 0;
+                                        } else {
+                                            input = cut(input, k + 2, input.size());
+                                            moreCommands = true;
+                                            k = 0;
+                                        }
+                                    }
+                                    
+                                    if (moreCommands) break; 
+                                    k++;
+                                }
+                                if (moreCommands == true) {
+                                    moreCommands = !moreCommands;
+                                }
                             }
                         }
                         
                         j++;
                     }
                 }
-                if (input.size() == 0) break;
-                if (input.at(i) == '&' && input.at(i+1) == '&')
-                {
-                    moreCommands = true;
-                    //empty list check to create first node
-                    if (ptr == 0)
-                    {
-                        op = input.substr(0, i);
-                        ptr = new Command(op);
-                        connVal = 2;
-                    }
-                    //creates operator Shelld on what was last seen and
-                    //updates what operator was last seen while creating
-                    //the operator
-                    else
-                    {
-                        op = input.substr(0, i);
-                        Shell* a = new Command(op);
-                        extendTree(a, connVal, ptr);
-                        connVal = 2;
-                    }
-                }
-                //all parts same as and parse
-                else if (input.at(i) == '|' && input.at(i+1) == '|')
-                {
-                    moreCommands = true;
-                    if (ptr == 0)
-                    {
-                        op = input.substr(0, i);
-                        ptr = new Command(op);
-                        connVal = 3;
-                    }
-                    else
-                    {
-                        op = input.substr(0, i);
-                        Shell* a = new Command(op);
-                        extendTree(a, connVal, ptr);
-                        connVal = 3;
-                    }
 
-                }
-                //all parts same as and parse
-                else if (input.at(i) == ';')
-                {
-                    if (ptr == 0)
-                    {
-                        op = input.substr(0, i);
-                        input = input.substr(i+1, input.size()-1);
-                        i = 0;
-                        ptr = new Command(op);
+                if (input.size() < 1) break;
+                
+                if (ptr == NULL) {
+                    if (input.at(i) == ';') {
+                        ptr = new Command(cut(cut(input, 0, i)));
+                        input = cut(input, i + 1, input.size() - 1);
                         connVal = 1;
-                    }
-                    else
-                    {
-                        op = input.substr(0, i);
-                        input = input.substr(i+1, input.size());
-                        i = 0;
-                        Shell* a = new Command(op);
-                        extendTree(a, connVal, ptr);
-                        connVal = 1;
-                    }
+                        i = connVal - 1;
+                    } else if (input.at(i) == '&' && input.at(i + 1) == '&') {
+                        ptr = new Command(cut(cut(input, 0, i)));
+                        connVal = 2;
 
-                }
-                if (moreCommands)
-                {
-                    if (input.size() > i+2)
-                    {
-                        moreCommands = false;
-                        input = input.substr(i+2, input.size());
+                        moreCommands = true;
+
+                        if (i + 2 >= input.size()) {
+                                input.erase(input.begin(), input.end());
+                                i = 0;
+                        } else {
+                            if (moreCommands == true) {
+                                moreCommands = !moreCommands;
+                            }
+                            input = cut(input, i + 2, input.size());
+                            i = 0;
+                        }
+
+                    } else if (input.at(i) == '|' && input.at(i + 1) == '|') {
+                        ptr = new Command(cut(cut(input, 0, i)));
+                        connVal = 3;
+
+                        moreCommands = true;
+
+                        if (i + 2 >= input.size()) {
+                                input.erase(input.begin(), input.end());
+                                i = 0;
+                        } else {
+                            if (moreCommands == true) {
+                                moreCommands = !moreCommands;
+                            }
+                            input = cut(input, i + 2, input.size());
+                            i = 0;
+                        }
                     }
-                    else
-                    {
-                        input = " ";
-                    }
-                    i = 0;
+                } else if (ptr != NULL) {
+                    if (input.at(i) == ';') {
+                        Shell* a = new Command(cut(cut(input, 0, i)));
+                        input = cut(input, i + 1, input.size());
+
+                        Shell* c = NULL;
+                        if (connVal == 1) {
+                            c = new Semi(ptr, a);
+                        } else if (connVal == 2) {
+                            c = new And(ptr, a);
+                        } else if (connVal == 3) {
+                            c = new Or(ptr, a);
+                        }
+
+                        connVal = 1;
+                        i = connVal - 1;
+                        ptr = c;
+                    } else if (input.at(i) == '&' && input.at(i + 1) == '&') {
+                        Shell* a = new Command(cut(cut(input, 0, i)));
+
+                        Shell* c = NULL;
+                        if (connVal == 1) {
+                            c = new Semi(ptr, a);
+                        } else if (connVal == 2) {
+                            c = new And(ptr, a);
+                        } else if (connVal == 3) {
+                            c = new Or(ptr, a);
+                        }
+
+                        connVal = 2;
+                        ptr = c;
+
+                        moreCommands = true;
+
+                        if (i + 2 >= input.size()) {
+                            input.erase(input.begin(), input.end());
+                            i = 0;
+                        } else {
+                            if (moreCommands == true) {
+                                moreCommands = !moreCommands;
+                            }
+                            input = cut(input, i + 2, input.size());
+                            i = 0;
+                        }
+                    } else if (input.at(i) == '|' && input.at(i + 1) == '|') {
+                        Shell* a = new Command(cut(cut(input, 0, i)));
+                        
+                        Shell* c = NULL;
+                        if (connVal == 1) {
+                            c = new Semi(ptr, a);
+                        } else if (connVal == 2) {
+                            c = new And(ptr, a);
+                        } else if (connVal == 3) {
+                            c = new Or(ptr, a);
+                        }
+
+                        connVal = 3;
+                        ptr = c;
+                        
+                        moreCommands = true;
+
+                        if (i + 2 >= input.size()) {
+                            input.erase(input.begin(), input.end());
+                            i = 0;
+                        } else {
+                            if (moreCommands == true) {
+                                moreCommands = !moreCommands;
+                            }
+                            input = cut(input, i + 2, input.size());
+                            i = 0;
+                        }
+                    }//-------------------------------------------------------
                 }
 
                 i++;
             }
-            //creates inital node if none were created
-            if (ptr == 0)
-            {
-                ptr = new Command(input);
+
+            Shell* b;
+
+            if (ptr != NULL) {
+                if (connVal == 1) {
+                    Shell* a = new Command(cut(input));
+                    b = new Semi(ptr, a);
+                } else if (connVal == 2) {
+                    Shell* a = new Command(cut(input));
+                    b = new And(ptr, a);
+                } else if (connVal == 3) {
+                    Shell* a = new Command(cut(input));
+                    b = new Or(ptr, a);
+                }
+                
+                ptr = b;
+            } else {
+                ptr = new Command(cut(cut(input)));
             }
-            //creates operator if node already exists
-            else
-            {
-                Shell* a = new Command(input);
-                if (connVal == 2)
-                {
-                    Shell* b = new And(ptr, a);
-                    ptr = b;
+        };
+//------------------------------------------------------------
+        Shell* nested(string inp) {
+            int connVal = 0;
+            bool moreComms = false;
+            Shell* subRoot = NULL;
+            int numParen = 0;
+            string op;
+            unsigned int parentheses = 0;
+
+            unsigned int i = 1;
+            i -= 1;
+
+            while (i < inp.size()) {
+                if (inp.at(i) == '(') {
+                    parentheses++;
+
+                    unsigned int j = i;
+                    j++;
+
+                    while (parentheses != 0 && j < inp.size()) {
+                        if (inp.at(j) == '('){
+                            parentheses++;
+                            numParen = parentheses;
+                        } else if (inp.at(j) == ')') {
+                            parentheses--;
+                            numParen = parentheses;
+                        }
+                        
+                        if (parentheses == 0) {
+                            int start = numParen;
+                            start = i + 1;
+                            int end = j - i;
+                            end -= 1;
+
+                            Shell* a = nested(cut(inp, start, end));
+                            inp = cut(inp, j + 1, inp.size() - 1);
+                            i = 1;
+                            i -= 1;
+
+                            if (subRoot != NULL) {
+                                Shell* c = NULL;
+                                if (connVal == 1) {
+                                    c = new Semi(subRoot, a);
+                                } else if (connVal == 2) {
+                                    c = new And(subRoot, a);
+                                } else if (connVal == 3) {
+                                    c = new Or(subRoot, a);
+                                }
+
+                                subRoot = c;
+
+                            } else {
+                                subRoot = a;
+                            }
+                            if (inp.size() != 0) {
+                                unsigned int k = 1;
+                                k -= 1;
+
+                                while (k < inp.size() + 1) {
+                                    if (inp.at(k) == ';') {
+                                        connVal = 1;
+                                        inp = cut(inp, k + 2, inp.size());
+                                    } else if (inp.at(k) == '&' && inp.at(k + 1) == '&') {
+                                        moreComms = true;
+
+                                        if (k + 2 >= inp.size()) {
+                                            inp.erase(inp.begin(), inp.end());
+                                            k = 0;
+                                        } else {
+                                            if (moreComms == true) {
+                                                moreComms = !moreComms;
+                                            }
+                                            inp = cut(inp, k + 2, inp.size());
+                                            k = 0;
+                                        }
+
+                                        connVal = 2;
+
+                                    } else if (inp.at(k) == '|' && inp.at(k + 1) == '|') {
+                                        moreComms = true;
+
+                                        if (k + 2 >= inp.size()) {
+                                            inp.erase(inp.begin(), inp.end());
+                                            k = 0;
+                                        } else {
+                                            if (moreComms == true) {
+                                                moreComms = !moreComms;
+                                            }
+                                            inp = cut(inp, k + 2, inp.size());
+                                            k = 0;
+                                        }
+
+                                        connVal = 3;
+                                    }
+
+                                    if (moreComms) break;
+                                    k++;
+                                }
+                         
+                                if (moreComms == true) {
+                                    moreComms = !moreComms;
+                                }
+                            }
+                        }
+
+                        j++;
+                    }
                 }
-                else if (connVal == 3)
-                {
-                    Shell* b = new  Or(ptr, a);
-                    ptr = b;
+ 
+                if (inp.size() < 1) break;
+
+                if (subRoot == NULL) {
+                    if (inp.at(i) == ';') {
+                        subRoot = new Command(cut(cut(inp, 0, i)));
+                        inp = cut(inp, i + 1, inp.size() - 1);
+                        connVal = 1;
+                        i = connVal - 1;
+                    } else if (inp.at(i) == '&' && inp.at(i + 1) == '&') {
+                        subRoot = new Command(cut(cut(inp, 0, i)));
+                        connVal = 2;
+
+                        moreComms = true;
+
+                        if (i + 2 >= inp.size()) {
+                                inp.erase(inp.begin(), inp.end());
+                                i = 0;
+                        } else {
+                            if (moreComms == true) {
+                                moreComms = !moreComms;
+                            }
+                            inp = cut(inp, i + 2, inp.size());
+                            i = 0;
+                        }
+
+                    } else if (inp.at(i) == '|' && inp.at(i + 1) == '|') {
+                        subRoot = new Command(cut(cut(inp, 0, i)));
+                        connVal = 3;
+
+                        moreComms = true;
+
+                        if (i + 2 >= inp.size()) {
+                                inp.erase(inp.begin(), inp.end());
+                                i = 0;
+                        } else {
+                            if (moreComms == true) {
+                                moreComms = !moreComms;
+                            }
+                            inp = cut(inp, i + 2, inp.size());
+                            i = 0;
+                        }
+                    }
+                } else if (subRoot != NULL) {
+                    if (inp.at(i) == ';') {
+                        Shell* a = new Command(cut(cut(inp, 0, i)));
+                        inp = cut(inp, i + 1, inp.size());
+
+                        Shell* c = NULL;
+                        if (connVal == 1) {
+                            c = new Semi(subRoot, a);
+                        } else if (connVal == 2) {
+                            c = new And(subRoot, a);
+                        } else if (connVal == 3) {
+                            c = new Or(subRoot, a);
+                        }
+
+                        connVal = 1;
+                        i = connVal - 1;
+                        subRoot = c;
+                    } else if (inp.at(i) == '&' && inp.at(i + 1) == '&') {
+                        Shell* a = new Command(cut(cut(inp, 0, i)));
+
+                        Shell* c = NULL;
+                        if (connVal == 1) {
+                            c = new Semi(subRoot, a);
+                        } else if (connVal == 2) {
+                            c = new And(subRoot, a);
+                        } else if (connVal == 3) {
+                            c = new Or(subRoot, a);
+                        }
+
+                        connVal = 2;
+                        subRoot = c;
+
+                        moreComms = true;
+
+                        if (i + 2 >= inp.size()) {
+                            inp.erase(inp.begin(), inp.end());
+                            i = 0;
+                        } else {
+                            if (moreComms == true) {
+                                moreComms = !moreComms;
+                            }
+                            inp = cut(inp, i + 2, inp.size());
+                            i = 0;
+                        }
+                    } else if (inp.at(i) == '|' && inp.at(i + 1) == '|') {
+                        Shell* a = new Command(cut(cut(inp, 0, i)));
+                        
+                        Shell* c = NULL;
+                        if (connVal == 1) {
+                            c = new Semi(subRoot, a);
+                        } else if (connVal == 2) {
+                            c = new And(subRoot, a);
+                        } else if (connVal == 3) {
+                            c = new Or(subRoot, a);
+                        }
+
+                        connVal = 3;
+                        subRoot = c;
+                        
+                        moreComms = true;
+
+                        if (i + 2 >= inp.size()) {
+                            inp.erase(inp.begin(), inp.end());
+                            i = 0;
+                        } else {
+                            if (moreComms == true) {
+                                moreComms = !moreComms;
+                            }
+                            inp = cut(inp, i + 2, inp.size());
+                            i = 0;
+                        }
+                    }
                 }
-                else if (connVal == 1)
-                {
-                    Shell* b = new Semi(ptr, a);
-                    ptr = b;
-                }
+
+                i++;
             }
+
+            Shell* b;
+
+            if (subRoot != NULL) {
+                if (connVal == 1) {
+                    Shell* a = new Command(cut(inp));
+                    b = new Semi(subRoot, a);
+                } else if (connVal == 2) {
+                    Shell* a = new Command(cut(inp));
+                    b = new And(subRoot, a);
+                } else if (connVal == 3) {
+                    Shell* a = new Command(cut(inp));
+                    b = new Or(subRoot, a);
+                }
+                
+                subRoot = b;
+            } else {
+                subRoot = new Command(cut(cut(inp)));
+            }
+
+//------------------------------------------------------------------------------
+            return subRoot;
         };
 
 };

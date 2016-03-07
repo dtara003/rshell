@@ -39,9 +39,9 @@ class Shell {
 };
 
 class Precedence : public Shell {
-    public:
+    private:
         Shell* sub;
-        
+    public:
         //constructors
         Precedence() {};
         Precedence(Shell* s)

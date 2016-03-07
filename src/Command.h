@@ -2,6 +2,7 @@
 #define COMMAND_H
 
 #include "Shell.h"
+#include <sys/stat.h>
 #include <vector>
 #include <sstream>
 #include <string>
@@ -28,6 +29,7 @@ class Command : public Shell {
 
 		//function returns true if command executed
 		status execute() {
+			struct stat buf;
 		    //cout << "CHECK: command passed into execute(): " << cmd << endl;	
 			//check if the string is "exit"
 			//we need a special case for this because execvp does not
@@ -49,6 +51,158 @@ class Command : public Shell {
 			for (unsigned int i = 0; i < cmd.size(); i++) {
 				if (cmd.at(i) == '\"') {
 					cmd.erase(i, 1);
+				}
+			}
+
+			//test command
+			if (cmd.substr(0,4) == "test" && cmd.length() == 4) {
+				cout << "(False)" << endl;
+				return FAILED;
+			}
+			if (cmd.substr(0,5) == "test ") {
+				cmd.erase(0,5);
+				if (cmd.substr(0,2) == "-d") {
+					cmd.erase(0,3);
+					if (cmd.length() == 0) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					const char* path = cmd.c_str();
+					stat(path, &buf);
+					if (S_ISDIR(buf.st_mode)) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					else {
+						cout << "(False)" << endl;
+						return FAILED;
+					}
+				}
+				else if (cmd.substr(0,2) == "-f") {
+					cmd.erase(0,3);
+					if (cmd.length() == 0) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					const char* path = cmd.c_str();
+					stat(path, &buf);
+					if (S_ISREG(buf.st_mode)) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					else {
+						cout << "(False)" << endl;
+						return FAILED;
+					}
+				}
+				else if (cmd.substr(0,2) == "-e") {
+					cmd.erase(0,3);
+					if (cmd.length() == 0) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					const char* path = cmd.c_str();
+					if (stat(path, &buf) == 0) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					else {
+						cout << "(False)" << endl;
+						return FAILED;
+					}
+				}
+				else {
+					if (cmd.length() == 0) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					const char* path = cmd.c_str();
+					if (stat(path, &buf) == 0) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					else {
+						cout << "(False)" << endl;
+						return FAILED;
+					}
+				}
+			}
+
+			//test command(square brackets)
+			if (cmd.substr(0,1) == "[") {
+				if (cmd.length() >= 2) {
+					if (cmd.substr(cmd.length() - 1, 1) != "]") {
+						cout << "[: missing \']\'" << endl;
+						return FAILED;
+					}
+					cmd.erase(0,2);
+				}
+				if (cmd.length() > 1)
+					cmd.erase(cmd.length() -2, 2);
+				if (cmd.substr(0,2) == "-d") {
+					cmd.erase(0,3);
+					if(cmd.length() == 0) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					const char* path = cmd.c_str();
+					stat(path, &buf);
+					if (S_ISDIR(buf.st_mode)) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					else {
+						cout << "(False)" << endl;
+						return FAILED;
+					}
+				}
+				else if (cmd.substr(0,2) == "-f") {
+					cmd.erase(0,3);
+					if (cmd.length() == 0) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					const char* path = cmd.c_str();
+					stat(path, &buf);
+					if (S_ISREG(buf.st_mode)) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					else {
+						cout << "(False)" << endl;
+						return FAILED;
+					}
+				}
+				else if (cmd.substr(0,2) == "-e") {
+					cmd.erase(0,3);
+					if (cmd.length() == 0) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					const char* path = cmd.c_str();
+					if (stat(path, &buf) == 0) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					else {
+						cout << "(False)" << endl;
+						return FAILED;
+					}
+				}
+				else {
+					if (cmd.length() == 0) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					const char* path = cmd.c_str();
+					if (stat(path, &buf) == 0) {
+						cout << "(True)" << endl;
+						return EXECUTED;
+					}
+					else {
+						cout << "(False)" << endl;
+						return FAILED;
+					}
 				}
 			}
 

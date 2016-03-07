@@ -19,34 +19,36 @@ class Command : public Shell {
 		string cmd;
 
 	public:
-		//a constructor that takes in string arguments and converts to char**
+		//a constructor that takes in string arguments
 		Command(string c) :cmd(c) {};
-
+		
+		//print function for testing
         void output() {
             cout << cmd << endl;
         };
 		
         ~Command() {};
 
-		//function returns true if command executed
+		//function returns EXECUTED if command executed
 		status execute() {
+			//strcut stat variable for stat() function argument
 			struct stat buf;
-		    //cout << "CHECK: command passed into execute(): " << cmd << endl;	
+	
 			//check if the string is "exit"
 			//we need a special case for this because execvp does not
 			//take exit as a command
+			
+			//use trim again to remove leading and trailing white spaces
 			trim(cmd);
-			//if the string is exit then we want to return EXIT and go back to
-			//our prompt class and delete the tree and call exit(0)
+
+			//if the string is exit then we want to return EXIT
+			//go back to our prompt class
+			//and delete the tree and call exit(0)
 			if (cmd == "exit") {
                 // check
 				//cout << cmd << endl;
                 return EXIT;
 			}
-		    
-            // check
-            // outputs cmd and its size to find discrepencies
-            //cout << cmd << "CHECK " << cmd.size() << endl;
 
 			//get rid of quotation marks
 			for (unsigned int i = 0; i < cmd.size(); i++) {
@@ -56,20 +58,28 @@ class Command : public Shell {
 			}
 
 			//test command
+			
+			//conditional statement for when test is entered byitself
 			if (cmd.substr(0,4) == "test" && cmd.length() == 4) {
 				cout << "(False)" << endl;
 				return FAILED;
 			}
+			//test command with flags and paths
 			if (cmd.substr(0,5) == "test ") {
+				//delete "test " from the string
 				cmd.erase(0,5);
 				if (cmd.substr(0,2) == "-d") {
+					//delete the flag
 					cmd.erase(0,3);
 					if (cmd.length() == 0) {
 						cout << "(True)" << endl;
 						return EXECUTED;
 					}
+					//convert to const char*
 					const char* path = cmd.c_str();
+					//call the stat function
 					stat(path, &buf);
+					//use appropriate macros
 					if (S_ISDIR(buf.st_mode)) {
 						cout << "(True)" << endl;
 						return EXECUTED;
@@ -132,14 +142,16 @@ class Command : public Shell {
 			//test command(square brackets)
 			if (cmd.substr(0,1) == "[") {
 				if (cmd.length() >= 2) {
+					//check for closing square bracket
 					if (cmd.substr(cmd.length() - 1, 1) != "]") {
 						cout << "[: missing \']\'" << endl;
 						return FAILED;
 					}
 					cmd.erase(0,2);
 				}
+				//conditionals used to avoid out of range errors
 				if (cmd.length() > 1)
-					cmd.erase(cmd.length() -2, 2);
+					cmd.erase(cmd.length() - 2, 2);
 				if (cmd.substr(0,2) == "-d") {
 					cmd.erase(0,3);
 					if(cmd.length() == 0) {
@@ -207,9 +219,9 @@ class Command : public Shell {
 				}
 			}
 
-            // check
-            //cout << cmd << "CHECK " << cmd.size() << endl;
+            
 
+			//execvp code starts here
 			//convert string to char []
 
 			unsigned int sz = 0; //will keep track of the size of the char**
@@ -264,17 +276,13 @@ class Command : public Shell {
 			}
 
 			//parent will have a pid > 0
-
-			//now we want to check what value the child returned(either a 50
-			//or 0). A 50 indicates that
 				
 			int status = 0;
 				
 			//wait for child to terminate(prevent "zombie" processes)
 			wait(&status);
             
-            //WIFEXITED() macro checks if the child process terminated properly
-            //or not
+            //check if the child process terminated(exited) properly
 			if (WEXITSTATUS(status) > 0) {
 				//this means the command did not execute so return false
 				return FAILED;

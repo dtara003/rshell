@@ -110,11 +110,14 @@ class Prompt {
         };
 
         void parse() {
-
+            // to ensure code does not break when unexpected keys entered
             if (input == "") {
+                return;
+            } else if (input.at(0) == '\t') {
                 return;
             }
 
+           
             while ((input.at(input.size() - 1) == '&') || (input.at(input.size() - 1) == '|') || (input.at(input.size() - 1) == ';')) {
                 input = cut(input, 0, input.size() - 1);
                 input = cut(input);

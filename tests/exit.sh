@@ -18,3 +18,25 @@ ls; ls; ls; exit
 cat test.cpp; exit;
 echo hello; exit && exit
 ls || exit && xyz
+test exit
+test -f exit
+test -d exit
+test -e exit
+test -d /home/csmajs/gocam001/CS100 || exit
+exit test
+(exit)
+exit []
+[ -f /home/csmajs/gocam001/CS100/rshell/src/Command.h ] exit
+[ exit ]
+exit && (echo A || [ -d /home/csmajs/gocam001/rshell/src])
+pwd && (exit || (ls && ls -a));
+(exit;)
+(exit&&)
+echo hello; (date && (mkdir Dir && ls) || exit);
+(sadfsad || exit)
+(exit && (pwd || date))
+(echo Hello && safasfa) && exit && echo This ran
+(date && echo Hello) && (exit && ls -a) || echo This ran
+e(xit) || exit && echo This ran
+pwd || (test -e) exit
+

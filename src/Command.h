@@ -7,8 +7,9 @@
 #include <sstream>
 #include <string>
 #include <errno.h>
+#include <boost/algorithm/string/trim.hpp>
 using namespace std;
-
+using namespace boost;
 class Command : public Shell {
 	private:
 		//execvp takes two arguments: cmd[0](which is the
@@ -34,7 +35,7 @@ class Command : public Shell {
 			//check if the string is "exit"
 			//we need a special case for this because execvp does not
 			//take exit as a command
-			
+			trim(cmd);
 			//if the string is exit then we want to return EXIT and go back to
 			//our prompt class and delete the tree and call exit(0)
 			if (cmd == "exit") {

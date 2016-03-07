@@ -117,23 +117,46 @@ class Prompt {
                 return;
             }
 
-           
-            while ((input.at(input.size() - 1) == '&') || (input.at(input.size() - 1) == '|') || (input.at(input.size() - 1) == ';')) {
+            // the followinf two while loops are probably not a viable method of
+            // interpreting command line inputs
+            // weak method error-catching
+            // just gets rid of starting and ending errors altogether
+                
+            // remove extra spaces from start and end of input string
+            
+            input = cut(input);
+
+            while ((input.at(input.size() - 1) == '&') ||
+            (input.at(input.size() - 1) == '|') || (input.at(input.size() - 1)
+            == ';')) {
                 input = cut(input, 0, input.size() - 1);
                 input = cut(input);
             }
-            while ((input.at(0) == '&') || (input.at(0) == '|') || (input.at(0) == ';')) {
+            while ((input.at(0) == '&') || (input.at(0) == '|') || (input.at(0)
+            == ';')) {
                 input = cut(input, 1, input.size());
                 input = cut(input);
             };
 
             input = cut (input);
 
+            // track parentheses
             int parentheses = 0;
+
+            // track previous connector
             int connVal = 0;
+
+            // track whether there will be more commands from same string
             bool moreCommands = false;
+
             ptr = NULL; 
+            
             unsigned int i = 0;
+            
+            //check to see if string has balanced parentheses
+            //done after comments are removed in case the commends end up
+            //removing parentheses
+            //return error if unbalanced
             int numParen = 0;
        
             for (i = 0; i < input.size(); ++i) {
@@ -144,16 +167,18 @@ class Prompt {
                     numParen--;
                 }
             }
-
+            
             if (numParen != 0) {
                 cout << "ERROR: unbalanced parentheses" << endl;
 
                 return;
             }
             
+
             numParen = 0;
             int pos = 0;
 
+            // set pos to location of outermost closing parenthesis if exists
             for (i = 0; i < input.size(); ++i) {
                 if (input.at(i) == '(') {
                     numParen++;
@@ -175,6 +200,8 @@ class Prompt {
                     unsigned int j = i;
                     j++;
 
+                    // track the location of pairs of parentheses and see where
+                    // they end
                     while (parentheses != 0) {
 
                         if (input.at(j) == '(') {
@@ -187,9 +214,11 @@ class Prompt {
                         // check
                         //cout << "1" << endl;
 
+                        // all opening and closing parentheses are accounted for
                         if (parentheses == 0) {
                             pos = j;
-                            //cout << "NESTING: " << cut(input, i + 1, j - i - 1) << endl;
+                            //cout << "NESTING: " << cut(input, i + 1, j - i - 1)
+                            //<< endl;
                             Shell* a = nested(cut(input, i + 1, j - i - 1));
                             input = cut(input, pos + 1, input.size() - 1);
                             //cout << "NEW: " << input << endl;
@@ -199,6 +228,8 @@ class Prompt {
                             //check
                             //cout << "2" << endl;
 
+                            // if a tree does not already exist then create a
+                            // root with a root pointer
                             if (ptr != NULL) {
                                 Shell* c = NULL;
                                 if (connVal == 1) {
@@ -211,16 +242,21 @@ class Prompt {
                                 
                                 ptr = c;
                             } else {
+                                // make the root pointer point to the root that
+                                // 'a' points to
                                 ptr = a;
                             }
                             
                             //check
                             //cout << "3" << endl;
-
+                            
+                            // in case of seg fault
                             if (input.size() == 0) {
                                 return;
                             }
-
+                            
+                            // continue building tree if the input still
+                            // contains commands
                             if (input.size() != 0) {
                                 //cout << input << endl;
                                 unsigned int k = 5;
@@ -237,28 +273,39 @@ class Prompt {
                                         int start = k + 1;
                                         int end = input.size() - 1;
                                         input = cut(input, start, end);
-                                    } else if (input.at(k) == '&' && input.at(k + 1) == '&') {
+                                    } else if (input.at(k) == '&' &&
+                                    input.at(k + 1) == '&') {
                                         connVal = 2;
+
+                                        //moreCommands will track whether or not
+                                        //this connector requires a right hand
+                                        //command and whether or not to expect
+                                        //one
                                         moreCommands = true;
 
                                         if (k + 2 >= input.size()) {
-                                            input.erase(input.begin(), input.end());
+                                            input.erase(input.begin(),
+                                            input.end());
                                             moreCommands = true;
                                             k = 0;
                                         } else {
-                                            input = cut(input, k + 2, input.size());
+                                            input = cut(input, k + 2,
+                                            input.size());
                                             moreCommands = true;
                                             k = 0;
                                         }
-                                    } else if (input.at(k) == '|' && input.at(k + 1) == '|') {
+                                    } else if (input.at(k) == '|' &&
+                                    input.at(k + 1) == '|') {
                                         connVal = 3;
                                         
                                         if (k + 2 >= input.size()) {
-                                            input.erase(input.begin(), input.end());
+                                            input.erase(input.begin(),
+                                            input.end());
                                             moreCommands = true;
                                             k = 0;
                                         } else {
-                                            input = cut(input, k + 2, input.size());
+                                            input = cut(input, k + 2,
+                                            input.size());
                                             moreCommands = true;
                                             k = 0;
                                         }
@@ -277,15 +324,20 @@ class Prompt {
                     }
                 }
 
+                // if the input is not empty then finish
                 if (input.size() < 1) break;
                 
+                // if a tree does not exist then build a new one and point the
+                // root pointer to the new root
                 if (ptr == NULL) {
                     if (input.at(i) == ';') {
+                        // same semicolon parse as assn2
                         ptr = new Command(cut(cut(input, 0, i)));
                         input = cut(input, i + 1, input.size() - 1);
                         connVal = 1;
                         i = connVal - 1;
                     } else if (input.at(i) == '&' && input.at(i + 1) == '&') {
+                        //same and parse as assn2
                         ptr = new Command(cut(cut(input, 0, i)));
                         connVal = 2;
 
@@ -303,6 +355,7 @@ class Prompt {
                         }
 
                     } else if (input.at(i) == '|' && input.at(i + 1) == '|') {
+                        //same or parse as assn2
                         ptr = new Command(cut(cut(input, 0, i)));
                         connVal = 3;
 
@@ -319,11 +372,14 @@ class Prompt {
                             i = 0;
                         }
                     }
+                //if a tree already exists then append this command to the tree
+                //and set the root pointer to the new root of the tree
                 } else if (ptr != NULL) {
                     if (input.at(i) == ';') {
                         Shell* a = new Command(cut(cut(input, 0, i)));
                         input = cut(input, i + 1, input.size());
-
+                        
+                        //append new command to tree
                         Shell* c = NULL;
                         if (connVal == 1) {
                             c = new Semi(ptr, a);
@@ -339,6 +395,7 @@ class Prompt {
                     } else if (input.at(i) == '&' && input.at(i + 1) == '&') {
                         Shell* a = new Command(cut(cut(input, 0, i)));
 
+                        //append new command to tree
                         Shell* c = NULL;
                         if (connVal == 1) {
                             c = new Semi(ptr, a);
@@ -366,6 +423,7 @@ class Prompt {
                     } else if (input.at(i) == '|' && input.at(i + 1) == '|') {
                         Shell* a = new Command(cut(cut(input, 0, i)));
                         
+                        //append new command to tree
                         Shell* c = NULL;
                         if (connVal == 1) {
                             c = new Semi(ptr, a);
@@ -396,6 +454,10 @@ class Prompt {
                 i++;
             }
 
+            //there is a single command with no connectors left after entire
+            //previous loop
+            //append this command to the tree if a tree already exits, or create
+            //a tree and point thr root pointer to it otherwise
             Shell* b;
 
             if (ptr != NULL) {
@@ -434,6 +496,8 @@ class Prompt {
                     unsigned int j = i;
                     j++;
 
+                    // track the location of pairs of parentheses and see where
+                    // they end
                     while (parentheses != 0 && j < inp.size()) {
                         if (inp.at(j) == '('){
                             parentheses++;
@@ -454,6 +518,8 @@ class Prompt {
                             i = 1;
                             i -= 1;
 
+                            // if a tree does not already exist then create a
+                            // root with a root pointer
                             if (subRoot != NULL) {
                                 Shell* c = NULL;
                                 if (connVal == 1) {
@@ -469,6 +535,9 @@ class Prompt {
                             } else {
                                 subRoot = a;
                             }
+
+                            // continue building tree if the input still
+                            // contains commands
                             if (inp.size() != 0) {
                                 unsigned int k = 1;
                                 k -= 1;
@@ -480,6 +549,10 @@ class Prompt {
                                     } else if (inp.at(k) == '&' && inp.at(k + 1) == '&') {
                                         moreComms = true;
 
+                                        //moreCommands will track whether or not
+                                        //this connector requires a right hand
+                                        //command and whether or not to expect
+                                        //one
                                         if (k + 2 >= inp.size()) {
                                             inp.erase(inp.begin(), inp.end());
                                             k = 0;
@@ -525,14 +598,18 @@ class Prompt {
                 }
  
                 if (inp.size() < 1) break;
-
+                
+                // if a tree does not exist then build a new one and point the
+                // root pointer to the new root
                 if (subRoot == NULL) {
+                    //same sem as parse in assn2
                     if (inp.at(i) == ';') {
                         subRoot = new Command(cut(cut(inp, 0, i)));
                         inp = cut(inp, i + 1, inp.size() - 1);
                         connVal = 1;
                         i = connVal - 1;
                     } else if (inp.at(i) == '&' && inp.at(i + 1) == '&') {
+                        //same and as parse in assn2
                         subRoot = new Command(cut(cut(inp, 0, i)));
                         connVal = 2;
 
@@ -550,6 +627,7 @@ class Prompt {
                         }
 
                     } else if (inp.at(i) == '|' && inp.at(i + 1) == '|') {
+                        //same or as parse in assn2
                         subRoot = new Command(cut(cut(inp, 0, i)));
                         connVal = 3;
 
@@ -566,11 +644,15 @@ class Prompt {
                             i = 0;
                         }
                     }
+
+                //if a tree already exists then append this command to the tree
+                //and set the root pointer to the new root of the tree
                 } else if (subRoot != NULL) {
                     if (inp.at(i) == ';') {
                         Shell* a = new Command(cut(cut(inp, 0, i)));
                         inp = cut(inp, i + 1, inp.size());
 
+                        //append new command to tree
                         Shell* c = NULL;
                         if (connVal == 1) {
                             c = new Semi(subRoot, a);
@@ -586,6 +668,7 @@ class Prompt {
                     } else if (inp.at(i) == '&' && inp.at(i + 1) == '&') {
                         Shell* a = new Command(cut(cut(inp, 0, i)));
 
+                        //append new command to tree
                         Shell* c = NULL;
                         if (connVal == 1) {
                             c = new Semi(subRoot, a);
@@ -613,6 +696,7 @@ class Prompt {
                     } else if (inp.at(i) == '|' && inp.at(i + 1) == '|') {
                         Shell* a = new Command(cut(cut(inp, 0, i)));
                         
+                        //append new command to tree
                         Shell* c = NULL;
                         if (connVal == 1) {
                             c = new Semi(subRoot, a);
@@ -643,6 +727,10 @@ class Prompt {
                 i++;
             }
 
+            //there is a single command with no connectors left after entire
+            //previous loop
+            //append this command to the tree if a tree already exits, or create
+            //a tree and point thr root pointer to it otherwise
             Shell* b;
 
             if (subRoot != NULL) {

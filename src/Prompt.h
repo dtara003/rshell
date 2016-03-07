@@ -110,6 +110,22 @@ class Prompt {
         };
 
         void parse() {
+
+            if (input == "") {
+                return;
+            }
+
+            while ((input.at(input.size() - 1) == '&') || (input.at(input.size() - 1) == '|') || (input.at(input.size() - 1) == ';')) {
+                input = cut(input, 0, input.size() - 1);
+                input = cut(input);
+            }
+            while ((input.at(0) == '&') || (input.at(0) == '|') || (input.at(0) == ';')) {
+                input = cut(input, 1, input.size());
+                input = cut(input);
+            };
+
+            input = cut (input);
+
             int parentheses = 0;
             int connVal = 0;
             bool moreCommands = false;
@@ -157,6 +173,7 @@ class Prompt {
                     j++;
 
                     while (parentheses != 0) {
+
                         if (input.at(j) == '(') {
                             parentheses++;
                             numParen = parentheses;
@@ -164,16 +181,22 @@ class Prompt {
                             parentheses--;
                             numParen = parentheses;
                         }
+                        // check
+                        //cout << "1" << endl;
 
-                        if (parentheses == 0)
-                        {
+                        if (parentheses == 0) {
                             pos = j;
+                            //cout << "NESTING: " << cut(input, i + 1, j - i - 1) << endl;
                             Shell* a = nested(cut(input, i + 1, j - i - 1));
                             input = cut(input, pos + 1, input.size() - 1);
+                            //cout << "NEW: " << input << endl;
                             i = 1;
                             i -= 1;
+                            
+                            //check
+                            //cout << "2" << endl;
 
-                            if (ptr != NULL){
+                            if (ptr != NULL) {
                                 Shell* c = NULL;
                                 if (connVal == 1) {
                                     c = new Semi(ptr, a);
@@ -184,16 +207,26 @@ class Prompt {
                                 }
                                 
                                 ptr = c;
-                            }
-                            else {
+                            } else {
                                 ptr = a;
                             }
-                            if (input.size() != 0)
-                            {
+                            
+                            //check
+                            //cout << "3" << endl;
+
+                            if (input.size() == 0) {
+                                return;
+                            }
+
+                            if (input.size() != 0) {
+                                //cout << input << endl;
                                 unsigned int k = 5;
                                 while (k != 0) {
                                     k--;
                                 }
+                                
+                                //check
+                                //cout << "5" << endl;
 
                                 while (k < input.size() + 1) {
                                     if (input.at(k) == ';') {
